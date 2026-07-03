@@ -1,105 +1,41 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Media Scheduler
 
-## Getting Started
-
-First, run the development server:
-
-```bash
-npm run dev
-# or
-yarn dev
-# AI Social Media Scheduler
-
-An AI-powered social media management platform that allows users to create, schedule, manage, and publish content across multiple social media platforms from a single dashboard.
+Media Scheduler is a Next.js application for planning, generating, and publishing social media content from a single dashboard. It combines a content calendar, AI-assisted post ideas, scheduled publishing, and multi-channel account management in one place.
 
 ## Features
 
-### Content Management
-
-* Create and edit social media posts
-* Rich text editor support
-* Media upload and management
-* AI-generated captions and content ideas
-* Post preview before publishing
-
-### Scheduling
-
-* Schedule posts for future publishing
-* Calendar View for content planning
-* List View for scheduled posts
-* Automated publishing workflow
-* Time zone support
-
-### Multi-Platform Publishing
-
-* Twitter/X
-* LinkedIn
-* Facebook
-* Instagram
-* Threads
-* YouTube
-* TikTok
-* Bluesky
-
-### Dashboard
-
-* Unified content management dashboard
-* Analytics overview
-* Connected accounts management
-* Publishing history
-* Activity tracking
-
-### AI Features
-
-* AI caption generation
-* Content suggestions
-* Hashtag recommendations
-* Post optimization assistance
-
-### Workflow Management
-
-* Kanban board for content planning
-* Draft management
-* Scheduled posts tracking
-* Publishing queue monitoring
-
----
+- Create and edit posts with rich text and media support
+- Generate content ideas and post copy with AI assistance
+- View scheduled content in calendar and list layouts
+- Preview posts before publishing
+- Connect and manage social channels through OAuth
+- Automate publishing workflows with Inngest
+- Use Clerk for authentication and InsForge for backend services
 
 ## Tech Stack
 
-### Frontend
+- Next.js 16
+- React 19
+- TypeScript
+- Tailwind CSS
+- shadcn/ui
+- TanStack Query
+- Inngest
+- Clerk
+- InsForge
+- PostgreSQL
 
-* Next.js 15
-* React 19
-* TypeScript
-* Tailwind CSS
-* Shadcn/UI
+## Getting Started
 
-### Backend
+### 1. Install dependencies
 
-* Next.js API Routes
-* Inngest
-* Clerk Authentication
-* InsForge
+```bash
+npm install
+```
 
-### Database
+### 2. Create environment variables
 
-* PostgreSQL
-
-### AI
-
-* OpenAI
-* AI SDK
-
-### Deployment
-
-* Vercel
-
----
-
-## Environment Variables
-
-Create a `.env.local` file:
+Create a `.env.local` file in the project root and add the variables below.
 
 ```env
 # InsForge
@@ -124,7 +60,7 @@ NEXT_PUBLIC_APP_URL=http://localhost:3000
 CHANNEL_TOKEN_ENCRYPTION_KEY=
 CHANNEL_OAUTH_STATE_SECRET=
 
-# Twitter/X
+# OAuth providers (add the ones you plan to use)
 TWITTER_CLIENT_ID=
 TWITTER_CLIENT_SECRET=
 TWITTER_AUTH_URL=https://x.com/i/oauth2/authorize
@@ -132,131 +68,62 @@ TWITTER_TOKEN_URL=https://api.x.com/2/oauth2/token
 TWITTER_PROFILE_URL=https://api.x.com/2/users/me
 TWITTER_SCOPES=tweet.read,users.read,tweet.write,offline.access
 
-# LinkedIn
 LINKEDIN_CLIENT_ID=
 LINKEDIN_CLIENT_SECRET=
 
-# Facebook
 FACEBOOK_CLIENT_ID=
 FACEBOOK_CLIENT_SECRET=
 
-# Instagram
 INSTAGRAM_CLIENT_ID=
 INSTAGRAM_CLIENT_SECRET=
 
-# Threads
 THREADS_CLIENT_ID=
 THREADS_CLIENT_SECRET=
 
-# TikTok
 TIKTOK_CLIENT_ID=
 TIKTOK_CLIENT_SECRET=
 
-# YouTube
 YOUTUBE_CLIENT_ID=
 YOUTUBE_CLIENT_SECRET=
 
-# Bluesky
 BLUESKY_CLIENT_ID=
 BLUESKY_CLIENT_SECRET=
 ```
 
----
+> If you use Clerk JWT templates for InsForge, make sure the template named in `CLERK_INSFORGE_TEMPLATE` exists in your Clerk dashboard.
 
-## Installation
-
-### Clone Repository
-
-```bash
-git clone <repository-url>
-cd media-scheduler
-```
-
-### Install Dependencies
-
-```bash
-npm install
-```
-
-### Run Development Server
+### 3. Run the app
 
 ```bash
 npm run dev
 ```
 
-Open:
+Open http://localhost:3000 in your browser.
 
-```text
-http://localhost:3000
-```
-
----
-
-## Build for Production
+## Available Scripts
 
 ```bash
+npm run dev
 npm run build
 npm start
+npm run lint
 ```
-
----
 
 ## Project Structure
 
 ```text
-src/
-├── app/
-├── components/
-├── lib/
-├── actions/
-├── hooks/
-├── providers/
-├── services/
-├── types/
-└── inngest/
+app/                # Next.js app router pages and API routes
+components/         # Reusable UI components
+lib/                # Shared utilities and server integrations
+hooks/              # Custom React hooks
+inngest/            # Scheduled/background workflow definitions
+types/              # Shared TypeScript types
+public/             # Static assets
 ```
-
----
-
-## OAuth Setup
-
-### Twitter/X
-
-1. Create a Developer App
-2. Generate Client ID and Client Secret
-3. Configure Redirect URI
-4. Add credentials to `.env.local`
-
-### LinkedIn
-
-1. Create LinkedIn Developer App
-2. Enable Sign In with LinkedIn
-3. Configure OAuth Redirect URLs
-4. Add credentials to `.env.local`
-
-### Meta Platforms
-
-Used for:
-
-* Facebook
-* Instagram
-* Threads
-
-Create an app in Meta Developer Console and configure required permissions.
-
-### Google
-
-Used for:
-
-* YouTube
-
-Create OAuth credentials in Google Cloud Console.
-
----
 
 ## Deployment
 
-### Vercel
+This project is ready to be deployed to Vercel or any other platform that supports Next.js. Make sure all required environment variables are configured in your hosting environment.
 
 ```bash
 vercel
