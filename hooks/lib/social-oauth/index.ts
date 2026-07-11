@@ -166,7 +166,46 @@ const PROVIDERS: Record<ChannelTypeEnum, any> = {
     [ChannelTypeEnum.TIKTOK]: createProvider(ChannelTypeEnum.TIKTOK),
 }
 
-export function getOAuthProvider(type:ChannelTypeEnum) {
+function createMockProvider(type: ChannelTypeEnum): OAuthProvider {
+  return {
+    type,
+    getAuthorizationUrl: ({ state, redirectUri }) => {
+      const params = new URLSearchParams({
+        code: `mock_code_${type.toLowerCase()}`,
+        state,
+      });
+      return `${redirectUri}?${params.toString()}`;
+    },
+    exchangeCodeForToken: async () => {
+      return {
+        accessToken: `mock_access_token_${type.toLowerCase()}`,
+        refreshToken: `mock_refresh_token_${type.toLowerCase()}`,
+        expiresAt: new Date(Date.now() + 3600 * 1000).toISOString(),
+      };
+    },
+    refreshToken: async () => {
+      return {
+        accessToken: `mock_access_token_${type.toLowerCase()}_refreshed`,
+        refreshToken: `mock_refresh_token_${type.toLowerCase()}_refreshed`,
+        expiresAt: new Date(Date.now() + 3600 * 1000).toISOString(),
+      };
+    },
+    getProfile: async () => {
+      return {
+        providerAccountId: `mock_${type.toLowerCase()}_id_${Math.floor(100000 + Math.random() * 900000)}`,
+        handle: `mock_${type.toLowerCase()}_user`,
+        profileImage: `https://avatar.iran.liara.run/public/boy?username=mock_${type.toLowerCase()}_user`,
+      };
+    },
+  };
+}
+
+export function getOAuthProvider(type:ChannelTypeEnum): OAuthProvider {
+   const clientId = process.env[`${type}_CLIENT_ID`];
+   if (!clientId) {
+      console.warn(`[OAuth] Using MOCK provider for ${type} because ${type}_CLIENT_ID is missing or empty.`);
+      return createMockProvider(type);
+   }
    return PROVIDERS[type];
 }
 

@@ -15,8 +15,7 @@ let cachedClient: InsForgeClient | null = null;
 let cachedUserId: string | null = null;
 let refreshInterval: NodeJS.Timeout | null = null;
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-async function refreshAuthToken(client: InsForgeClient, retries = 3): Promise<void> {
+async function refreshAuthToken(client: InsForgeClient): Promise<void> {
   try {
     const session = await auth();
     const token = await session?.getToken({ template: SERVER_TOKEN_TEMPLATE });
@@ -25,13 +24,13 @@ async function refreshAuthToken(client: InsForgeClient, retries = 3): Promise<vo
     } else {
       throw new Error('No token received from Clerk');
     }
-  } catch (err) {
-    // if (retries > 0) {
-    //   console.log(`Retrying token refresh... (${retries} retries left)`);
-    //   setTimeout(() => refreshAuthToken(client, retries - 1), 1000);
-    // }else {
-    console.error('Failed to refresh Clerk token for InsForge client', err);
-    client.getHttpClient().setAuthToken(null);
+  } catch (err: unknown) {
+    console.error('Failed to refresh Clerk token for InsForge client, falling back to PROJECT_API_KEY', err);
+    if (PROJECT_API_KEY) {
+      client.getHttpClient().setAuthToken(PROJECT_API_KEY);
+    } else {
+      client.getHttpClient().setAuthToken(null);
+    }
   }
 }
 
