@@ -145,12 +145,6 @@ Add all environment variables in the Vercel dashboard before deployment.
 
 ---
 
-## License
-
-MIT License
-
----
-
 ## Author
 
 Developed by Suguda Thakur Marndi.
