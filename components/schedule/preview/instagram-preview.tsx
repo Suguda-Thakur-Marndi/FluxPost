@@ -41,7 +41,7 @@ export function InstagramPreview({ text, images }: InstagramPreviewProps) {
         <div className="flex items-center justify-between p-3 pt-0">
           <div className="flex items-center gap-2">
             <Avatar className="size-8">
-              <AvatarImage src="./images/avatar.webp" />
+              <AvatarImage src="/images/avatar.webp" />
               <AvatarFallback>LM</AvatarFallback>
             </Avatar>
             <span className="text-sm font-semibold">Lemon</span>

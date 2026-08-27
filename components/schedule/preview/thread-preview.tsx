@@ -16,7 +16,7 @@ export function ThreadPreview({ text, images, profileImage, handle }: ThreadPrev
         <div className="flex items-start gap-3">
           <div className="relative">
             <Avatar className="size-8">
-              <AvatarImage src={profileImage || "./images/avatar.webp"} />
+              <AvatarImage src={profileImage || "/images/avatar.webp"} />
               <AvatarFallback>LM</AvatarFallback>
             </Avatar>
             <div className="absolute -bottom-1 -right-1 size-4 bg-black rounded-full flex items-center justify-center border-2 border-white">

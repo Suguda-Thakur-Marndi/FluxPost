@@ -72,7 +72,7 @@ export function YoutubePreview({ text, images }: YoutubePreviewProps) {
           <div className="absolute bottom-4 left-4 right-4 flex items-end justify-between">
             <div className="flex items-center gap-2">
               <Avatar className="size-9 border-2 border-white/20">
-                <AvatarImage src="./images/avatar.webp" />
+                <AvatarImage src="/images/avatar.webp" />
                 <AvatarFallback>LM</AvatarFallback>
               </Avatar>
               <span className="text-white text-[14px] font-bold">@lemon</span>
@@ -84,7 +84,7 @@ export function YoutubePreview({ text, images }: YoutubePreviewProps) {
             { }
             <div className="size-10 rounded-lg bg-gradient-to-br from-indigo-500 to-purple-600 border-2 border-white/30 overflow-hidden shadow-lg animate-pulse">
                 <Avatar className="size-full rounded-none">
-                    <AvatarImage src="./images/avatar.webp" />
+                    <AvatarImage src="/images/avatar.webp" />
                 </Avatar>
             </div>
           </div>

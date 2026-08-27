@@ -21,7 +21,7 @@ export function LinkedinPreview({ text, images, profileImage, handle }: Linkedin
         <div className="flex items-start justify-between mb-3 px-3">
           <div className="flex items-start gap-2">
             <Avatar className="size-9">
-              <AvatarImage src={profileImage || "./images/avatar.webp"} />
+              <AvatarImage src={profileImage || "/images/avatar.webp"} />
               <AvatarFallback>LM</AvatarFallback>
             </Avatar>
             <div className="flex flex-col">

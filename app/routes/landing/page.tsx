@@ -24,9 +24,10 @@ import { useState, useRef } from "react";
 /* ─── Data ─────────────────────────────────────────────────────────── */
 
 const navItems = [
-  { label: "Features", href: "#features" },
-  { label: "Workflow", href: "#workflow" },
-  { label: "Pricing",  href: "#pricing"  },
+  { label: "Features", href: "/features" },
+  { label: "Workflow", href: "/workflow" },
+  { label: "Channels", href: "/channels" },
+  { label: "Pricing",  href: "/pricing"  },
 ];
 
 const platformBadges = [
@@ -158,13 +159,13 @@ export default function LandingPage() {
 
           <nav className="hidden items-center gap-8 md:flex">
             {navItems.map((item) => (
-              <a
+              <Link
                 key={item.label}
                 href={item.href}
                 className="text-sm font-medium text-muted-foreground transition-all hover:text-foreground hover:scale-105"
               >
                 {item.label}
-              </a>
+              </Link>
             ))}
           </nav>
 
@@ -732,9 +733,9 @@ export default function LandingPage() {
             © {new Date().getFullYear()} All rights reserved.
           </p>
           <div className="flex gap-8 text-sm font-medium text-muted-foreground">
-            <a href="#" className="hover:text-foreground transition-colors">Privacy</a>
-            <a href="#" className="hover:text-foreground transition-colors">Terms</a>
-            <a href="#" className="hover:text-foreground transition-colors">Contact</a>
+            <Link href="/privacy" className="hover:text-foreground transition-colors">Privacy</Link>
+            <Link href="/terms" className="hover:text-foreground transition-colors">Terms</Link>
+            <Link href="/contact" className="hover:text-foreground transition-colors">Contact</Link>
           </div>
         </div>
       </footer>

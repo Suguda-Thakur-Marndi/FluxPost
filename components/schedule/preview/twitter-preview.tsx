@@ -15,7 +15,7 @@ export function TwitterPreview({ text, images,profileImage,handle }: TwitterPrev
       <CardContent>
         <div className="flex items-start gap-3">
           <Avatar className="size-9">
-            <AvatarImage src={profileImage || "./images/avatar.webp"} />
+            <AvatarImage src={profileImage || "/images/avatar.webp"} />
             <AvatarFallback>LM</AvatarFallback>
           </Avatar>
           <div className="flex-1 min-w-0">

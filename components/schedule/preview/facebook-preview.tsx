@@ -21,7 +21,7 @@ export function FacebookPreview({ text, images, profileImage, handle }: Facebook
         <div className="flex items-start justify-between mb-3 px-4">
           <div className="flex items-start gap-3">
             <Avatar className="size-10">
-              <AvatarImage src={profileImage || "./images/avatar.webp"} />
+              <AvatarImage src={profileImage || "/images/avatar.webp"} />
               <AvatarFallback>LM</AvatarFallback>
             </Avatar>
             <div>
