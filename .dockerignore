@@ -1,0 +1,39 @@
+# Dependencies
+node_modules
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# Next.js build output and cache
+.next
+out
+
+# Local environment and secrets
+.env*.local
+.env.development
+.env.test
+.env.production
+
+# Version control
+.git
+.gitignore
+
+# IDE and OS files
+.vscode
+.idea
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+.DS_Store
+Thumbs.db
+
+# Documentation and project tooling
+README.md
+CLAUDE.md
+AGENTS.md
+lint-results.json
+.insforge
+tsconfig.tsbuildinfo

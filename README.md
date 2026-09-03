@@ -107,7 +107,41 @@ npm run dev
 npm run build
 npm start
 npm run lint
+npm run docker:build      # Build the Docker image
+npm run docker:run        # Run container with .env.local
+npm run docker:up         # Start containers with Docker Compose
+npm run docker:down       # Stop containers
 ```
+
+## Running with Docker
+
+### Using Docker Compose (Recommended)
+
+1. Make sure your `.env.local` or `.env` file is created with required variables.
+2. Start the application:
+   ```bash
+   docker compose up --build -d
+   ```
+3. To include the Inngest Dev Server for background scheduling workflows:
+   ```bash
+   docker compose --profile with-inngest up --build -d
+   ```
+4. Access the application at [http://localhost:3000](http://localhost:3000) (and Inngest dashboard at [http://localhost:8288](http://localhost:8288)).
+5. Stop the containers:
+   ```bash
+   docker compose down
+   ```
+
+### Using Docker CLI Directly
+
+1. Build the Docker image:
+   ```bash
+   docker build -t media-scheduler .
+   ```
+2. Run the container:
+   ```bash
+   docker run -p 3000:3000 --env-file .env.local media-scheduler
+   ```
 
 ## Project Structure
 
@@ -119,17 +153,20 @@ hooks/              # Custom React hooks
 inngest/            # Scheduled/background workflow definitions
 types/              # Shared TypeScript types
 public/             # Static assets
+Dockerfile          # Multi-stage optimized container image
+docker-compose.yml  # Container orchestration setup
+.dockerignore       # Docker build context exclusions
 ```
 
 ## Deployment
 
-This project is ready to be deployed to Vercel or any other platform that supports Next.js. Make sure all required environment variables are configured in your hosting environment.
+This project is ready to be deployed via Docker (AWS ECS, Google Cloud Run, Azure Container Apps, DigitalOcean, Railway, Render) or to Vercel. Make sure all required environment variables are configured in your hosting environment.
 
 ```bash
 vercel
 ```
 
-Add all environment variables in the Vercel dashboard before deployment.
+Add all environment variables in your hosting dashboard before deployment.
 
 ---
 
