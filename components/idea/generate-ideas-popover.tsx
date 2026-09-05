@@ -34,10 +34,12 @@ export function GenerateIdeasPopover({ onGenerated }: GenerateIdeasPopoverProps)
   const [selectedIdea, setSelectedIdea] = useState(0)
    const { data: subscription, isLoading } = useSubscription()
 
-   const canUseAI = !!subscription?.subscriptionItems?.some(item => {
-    const planSlug = item.plan.slug
-    return planSlug === "pro" || planSlug === "business"
-   })
+   const canUseAI =
+    process.env.NODE_ENV === "development" ||
+    !!subscription?.subscriptionItems?.some(item => {
+      const planSlug = item.plan.slug
+      return planSlug === "pro" || planSlug === "business" || planSlug === "premium"
+    })
 
   const generateMutation = useMutation({
     mutationFn: async ({ businessType, targetAudience }: {
@@ -49,7 +51,8 @@ export function GenerateIdeasPopover({ onGenerated }: GenerateIdeasPopoverProps)
         body: JSON.stringify({ businessType, targetAudience }),
       })
       if (!res.ok) {
-        throw new Error("Failed to generate ideas")
+        const data = await res.json().catch(() => null)
+        throw new Error(data?.error || "Failed to generate ideas")
       }
       return res.json()
     },
@@ -59,7 +62,8 @@ export function GenerateIdeasPopover({ onGenerated }: GenerateIdeasPopoverProps)
     },
     onError: (error) => {
       console.error("Generation error:", error)
-      toast.error("Failed to generate ideas. Please try again.")
+      const msg = error instanceof Error ? error.message : "Failed to generate ideas. Please try again."
+      toast.error(msg)
     }
   })
 

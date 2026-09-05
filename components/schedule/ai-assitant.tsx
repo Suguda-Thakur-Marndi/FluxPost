@@ -28,9 +28,10 @@ export function AIAssistant({ className, content, channelId, onGenerate }: AIAss
   const [prompt, setPrompt] = React.useState("")
     const { data: subscription, isLoading } = useSubscription()
   const canUseAI =
+    process.env.NODE_ENV === "development" ||
     !!subscription?.subscriptionItems?.some((item) => {
       const planSlug = item.plan.slug
-      return planSlug === "pro" || planSlug === "premium"
+      return planSlug === "pro" || planSlug === "premium" || planSlug === "business"
     })
 
   const generateMutation = useMutation({
@@ -46,7 +47,8 @@ export function AIAssistant({ className, content, channelId, onGenerate }: AIAss
         }),
       })
       if (!res.ok) {
-        throw new Error("Failed to generate post")
+        const data = await res.json().catch(() => null)
+        throw new Error(data?.error || "Failed to generate post")
       }
       return res.json()
     },
