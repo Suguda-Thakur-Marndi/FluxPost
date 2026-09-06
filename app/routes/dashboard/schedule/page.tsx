@@ -4,6 +4,7 @@ import { Suspense, useState } from "react";
 import { useQueryState } from "nuqs"
 import { NuqsAdapter } from "nuqs/adapters/next/app";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { motion, AnimatePresence } from "framer-motion";
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -27,15 +28,21 @@ const SchedulePageContent = () => {
     <div className="flex flex-col h-full bg-transparent">
       <header className="flex flex-col sm:flex-row items-start sm:items-center justify-between px-6 md:px-8 pt-6 pb-4 gap-4">
         <div>
-          <h1 className="text-2xl font-black tracking-tight text-foreground/90 flex items-center gap-2">
-            <span className="bg-gradient-to-r from-primary to-purple-600 bg-clip-text text-transparent">All Channels</span>
-            <span className="text-muted-foreground/30 font-light text-xl">/</span>
-            <span className="text-lg font-medium text-muted-foreground">Schedule</span>
-          </h1>
+          <div className="flex items-center gap-2">
+            <h1 className="text-2xl font-bold tracking-tight text-foreground">
+              Content Calendar
+            </h1>
+            <Badge variant="outline" className="text-xs font-semibold border-border bg-muted/40">
+              Schedule
+            </Badge>
+          </div>
+          <p className="text-xs text-muted-foreground mt-0.5">
+            Plan, schedule, and monitor posts across all connected channels.
+          </p>
         </div>
 
-        <div className="flex items-center gap-4 w-full sm:w-auto justify-between sm:justify-end">
-          <div className="bg-muted/50 dark:bg-black/20 p-1 rounded-xl border border-white/10 shadow-inner flex relative">
+        <div className="flex items-center gap-3 w-full sm:w-auto justify-between sm:justify-end">
+          <div className="bg-muted/60 p-1 rounded-lg border border-border flex relative">
             {["list", "calendar"].map((view) => (
               <button
                 key={view}
@@ -43,19 +50,19 @@ const SchedulePageContent = () => {
                   setStatus(null);
                   setActiveView(view as ViewType);
                 }}
-                className={`relative px-4 py-1.5 text-sm font-medium rounded-lg transition-colors z-10 flex items-center gap-2 ${
-                  activeView === view ? "text-foreground" : "text-muted-foreground hover:text-foreground/80"
+                className={`relative px-3 py-1.5 text-xs font-semibold rounded-md transition-colors z-10 flex items-center gap-1.5 ${
+                  activeView === view ? "text-foreground" : "text-muted-foreground hover:text-foreground"
                 }`}
               >
                 {activeView === view && (
                   <motion.div
                     layoutId="activeTab"
-                    className="absolute inset-0 bg-background dark:bg-white/10 rounded-lg shadow-md border border-white/20"
-                    transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
+                    className="absolute inset-0 bg-background rounded-md shadow-xs border border-border/80"
+                    transition={{ type: "spring", bounce: 0.15, duration: 0.3 }}
                   />
                 )}
-                <span className="relative z-20 flex items-center gap-2">
-                  {view === "list" ? <LayoutList className="size-4" /> : <CalendarIcon className="size-4" />}
+                <span className="relative z-20 flex items-center gap-1.5">
+                  {view === "list" ? <LayoutList className="size-3.5" /> : <CalendarIcon className="size-3.5" />}
                   <span className="capitalize">{view}</span>
                 </span>
               </button>
@@ -64,10 +71,11 @@ const SchedulePageContent = () => {
           
           <Button 
             onClick={() => setCreatePostModalOpen(true)}
-            className="rounded-xl shadow-lg shadow-primary/20 hover:shadow-primary/40 hover:-translate-y-0.5 transition-all"
+            size="sm"
+            className="rounded-lg bg-primary text-primary-foreground font-semibold shadow-xs hover:bg-primary/90 gap-1.5"
           >
             <Plus className="size-4" />
-            <span className="font-bold">Add Post</span>
+            <span>Add Post</span>
           </Button>
         </div>
       </header>

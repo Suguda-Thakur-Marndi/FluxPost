@@ -8,65 +8,81 @@ import ChannelsTab from "@/components/settings/channels-tab"
 import { useTheme } from "next-themes"
 import { Label } from "@/components/ui/label"
 import { Switch } from "@/components/ui/switch"
+import { Badge } from "@/components/ui/badge"
 
 const SettingsPage = () => {
   const { user } = useUser()
   const { theme, setTheme } = useTheme()
   return (
-    <div className="w-full">
-      <div className="max-w-5xl mx-auto w-full h-full">
-        <div className="pt-6 pb-8">
-          <h1 className="text-2xl font-black tracking-tight text-foreground/90 flex items-center gap-2">
-            <span className="bg-gradient-to-r from-primary to-purple-600 bg-clip-text text-transparent">Account</span>
-            <span className="text-muted-foreground/30 font-light text-xl">/</span>
-            <span className="text-lg font-medium text-muted-foreground">Settings</span>
-          </h1>
+    <div className="flex-1 flex flex-col min-w-0 p-4 md:p-6 lg:p-8 space-y-6">
+      <div className="max-w-5xl mx-auto w-full">
+        <div className="pb-4 border-b border-border/60">
+          <div className="flex items-center gap-2">
+            <h1 className="text-2xl font-bold tracking-tight text-foreground">
+              Settings & Preferences
+            </h1>
+            <Badge variant="outline" className="text-xs font-semibold border-border bg-muted/40">
+              Account
+            </Badge>
+          </div>
+          <p className="text-sm text-muted-foreground mt-0.5">
+            Manage your connected social networks, account profile, and dashboard appearance.
+          </p>
         </div>
 
-        <div>
+        <div className="mt-6">
           <Tabs defaultValue="channels">
-            <div className="mb-8 w-full border-b border-border/40 pb-6">
-              <TabsList className="bg-muted/50 dark:bg-black/20 p-1.5 rounded-2xl border border-white/10 shadow-inner flex w-fit gap-1">
-                <TabsTrigger value="profile" className="rounded-xl data-[state=active]:bg-background data-[state=active]:shadow-md data-[state=active]:text-foreground text-muted-foreground hover:text-foreground/80 transition-all px-6 py-2.5 font-semibold text-sm">
-                  <User className="size-4 mr-2" />
+            <div className="mb-6 w-full border-b border-border/60 pb-3">
+              <TabsList className="bg-muted/50 p-1 rounded-lg border border-border flex w-fit gap-1">
+                <TabsTrigger 
+                  value="profile" 
+                  className="rounded-md data-[state=active]:bg-background data-[state=active]:shadow-xs data-[state=active]:text-foreground text-muted-foreground hover:text-foreground transition-all px-4 py-1.5 font-medium text-xs"
+                >
+                  <User className="size-3.5 mr-1.5" />
                   Profile
                 </TabsTrigger>
-                <TabsTrigger value="channels" className="rounded-xl data-[state=active]:bg-background data-[state=active]:shadow-md data-[state=active]:text-foreground text-muted-foreground hover:text-foreground/80 transition-all px-6 py-2.5 font-semibold text-sm">
-                  <Layers className="size-4 mr-2" />
+                <TabsTrigger 
+                  value="channels" 
+                  className="rounded-md data-[state=active]:bg-background data-[state=active]:shadow-xs data-[state=active]:text-foreground text-muted-foreground hover:text-foreground transition-all px-4 py-1.5 font-medium text-xs"
+                >
+                  <Layers className="size-3.5 mr-1.5" />
                   Channels
                 </TabsTrigger>
-                <TabsTrigger value="appearance" className="rounded-xl data-[state=active]:bg-background data-[state=active]:shadow-md data-[state=active]:text-foreground text-muted-foreground hover:text-foreground/80 transition-all px-6 py-2.5 font-semibold text-sm">
-                  <Palette className="size-4 mr-2" />
+                <TabsTrigger 
+                  value="appearance" 
+                  className="rounded-md data-[state=active]:bg-background data-[state=active]:shadow-xs data-[state=active]:text-foreground text-muted-foreground hover:text-foreground transition-all px-4 py-1.5 font-medium text-xs"
+                >
+                  <Palette className="size-3.5 mr-1.5" />
                   Appearance
                 </TabsTrigger>
               </TabsList>
             </div>
 
             <TabsContent value="profile" className="mt-0">
-              <Card className="glass-card border-white/10 shadow-xl bg-transparent">
+              <Card className="surface-card">
                 <CardHeader>
-                  <CardTitle className="text-xl font-bold">Your Profile</CardTitle>
-                  <CardDescription>Manage your account information and preferences.</CardDescription>
+                  <CardTitle className="text-base font-semibold">Your Profile</CardTitle>
+                  <CardDescription className="text-xs">Manage your account information and preferences.</CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <div className="flex items-center gap-6 p-4 rounded-2xl bg-muted/20 border border-white/5 shadow-inner">
+                  <div className="flex items-center gap-4 p-4 rounded-xl bg-muted/30 border border-border/70">
                     {user?.imageUrl ? (
                       <Image
                         src={user.imageUrl}
                         alt="Profile"
-                        className="h-20 w-20 rounded-full border-4 border-background shadow-lg"
-                        width={80}
-                        height={80}
+                        className="h-16 w-16 rounded-full border-2 border-border shadow-xs"
+                        width={64}
+                        height={64}
                       />
                     ):(
-                      <div className="flex h-20 w-20 items-center justify-center rounded-full bg-muted border-4 border-background shadow-lg">
-                        <User className="size-10 text-muted-foreground" />
+                      <div className="flex h-16 w-16 items-center justify-center rounded-full bg-muted border-2 border-border shadow-xs">
+                        <User className="size-8 text-muted-foreground" />
                       </div>
                     )}
 
                     <div>
-                      <p className="text-xl font-bold text-foreground">{user?.fullName || "No name set"}</p>
-                      <p className="text-sm font-medium text-muted-foreground">{user?.primaryEmailAddress?.emailAddress}</p>
+                      <p className="text-base font-bold text-foreground">{user?.fullName || "No name set"}</p>
+                      <p className="text-xs font-medium text-muted-foreground">{user?.primaryEmailAddress?.emailAddress}</p>
                     </div>
                   </div>
                    <div className="mt-6">
@@ -75,7 +91,7 @@ const SettingsPage = () => {
                       appearance={{
                         elements: {
                           rootBox: "w-full",
-                          card: "border-0 shadow-none",
+                          card: "border-0 shadow-none bg-transparent",
                         },
                       }}
                     />
@@ -89,17 +105,17 @@ const SettingsPage = () => {
             </TabsContent>
 
             <TabsContent value="appearance" className="mt-0">
-              <Card className="glass-card border-white/10 shadow-xl bg-transparent">
+              <Card className="surface-card">
                 <CardHeader>
-                  <CardTitle className="text-xl font-bold">Appearance</CardTitle>
-                  <CardDescription>Customize how the dashboard looks for you.</CardDescription>
+                  <CardTitle className="text-base font-semibold">Appearance</CardTitle>
+                  <CardDescription className="text-xs">Customize how the dashboard looks for you.</CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-6">
-                  <div className="flex items-center justify-between p-5 rounded-2xl bg-muted/20 border border-white/5 shadow-inner">
-                    <div className="space-y-1">
-                      <Label htmlFor="theme" className="text-base font-semibold">Dark mode</Label>
-                      <p className="text-sm font-medium text-muted-foreground/80">
-                        Toggle between light and dark theme
+                  <div className="flex items-center justify-between p-4 rounded-xl bg-muted/30 border border-border/70">
+                    <div className="space-y-0.5">
+                      <Label htmlFor="theme" className="text-sm font-semibold">Dark mode</Label>
+                      <p className="text-xs text-muted-foreground">
+                        Toggle between crisp light mode and deep obsidian dark mode
                       </p>
                     </div>
                     <Switch

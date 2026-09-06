@@ -4,7 +4,18 @@ import { usePathname } from 'next/navigation';
 import { HugeiconsIcon } from '@hugeicons/react'
 import { Sidebar, SidebarContent, SidebarFooter, SidebarGroup, SidebarGroupContent, SidebarGroupLabel, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem, SidebarTrigger } from '@/components/ui/sidebar';
 import { cn } from '@/lib/utils';
-import { Calendar, CreditCard, Lightbulb, Plus, PlusCircleIcon, Settings } from 'lucide-react';
+import { 
+  Calendar, 
+  CreditCard, 
+  Lightbulb, 
+  Plus, 
+  PlusCircleIcon, 
+  Settings, 
+  LayoutDashboard, 
+  Layers, 
+  Image as ImageIcon, 
+  BarChart3 
+} from 'lucide-react';
 import { useSidebar } from '@/components/ui/sidebar';
 import Logo from '@/components/logo';
 import { Button } from '@/components/ui/button';
@@ -20,8 +31,15 @@ import { useState } from 'react';
 import CreatePostDialog from '@/components/schedule/create-post-dialog';
 
 const mainNav = [
+  { name: "Overview", href: "/dashboard", icon: LayoutDashboard },
+  { name: "Content", href: "/content", icon: Layers },
+  { name: "Calendar", href: "/schedule", icon: Calendar },
+  { name: "Media Library", href: "/media", icon: ImageIcon },
   { name: "Ideas", href: "/ideas", icon: Lightbulb },
-  { name: "Schedule", href: "/schedule", icon: Calendar },
+  { name: "Analytics", href: "/analytics", icon: BarChart3 },
+];
+
+const secondaryNav = [
   { name: "Billing", href: "/billing", icon: CreditCard },
   { name: "Settings", href: "/settings", icon: Settings },
 ];
@@ -33,7 +51,7 @@ const AppSidebar = () => {
   const { user } = useUser()
   const [isCreatePostOpen, setIsCreatePostOpen] = useState<boolean>(false)
 
-   const connectMutation = useMutation({
+  const connectMutation = useMutation({
     mutationFn: async (channelTypeId: string) => {
       const res = await fetch("/api/channel/connect", {
         method: "POST",
@@ -80,172 +98,219 @@ const AppSidebar = () => {
 
   return (
     <>
-    <Sidebar collapsible="icon" className="border-none bg-transparent backdrop-blur-md">
-      <SidebarHeader className={cn("p-4", isCollapsed && "p-2", "bg-transparent")}>
+    <Sidebar collapsible="icon" className="border-r border-sidebar-border bg-sidebar text-sidebar-foreground">
+      <SidebarHeader className={cn("p-4 border-b border-sidebar-border/60", isCollapsed && "p-2")}>
         <div className='flex items-center justify-between'>
-           <Logo hideName={isCollapsed} className="scale-105 ml-1" />
-           <SidebarTrigger className="hidden md:flex -mx-8 mb-0" />
+           <Logo hideName={isCollapsed} className="scale-100 ml-1" />
+           <SidebarTrigger className="hidden md:flex text-muted-foreground hover:text-foreground" />
         </div>
-        <Button className='mt-6 w-full rounded-xl shadow-lg shadow-primary/20 hover:shadow-primary/40 hover:-translate-y-0.5 transition-all'
-         size={isCollapsed ? "icon": "lg"}
-         onClick={() => setIsCreatePostOpen(true)}
+        <Button 
+          className='mt-4 w-full rounded-lg bg-primary text-primary-foreground font-semibold shadow-xs hover:bg-primary/90 transition-colors'
+          size={isCollapsed ? "icon": "default"}
+          onClick={() => setIsCreatePostOpen(true)}
+          title="Create New Post"
         >
-            <Plus className="size-5" />
-           {!isCollapsed && <span className="font-bold">New Post</span>}
+          <Plus className="size-4" />
+          {!isCollapsed && <span>New Post</span>}
         </Button>
       </SidebarHeader>
-      <SidebarContent className={cn(!isCollapsed && "px-3", "bg-transparent")}>
+
+      <SidebarContent className={cn("px-2 py-3 space-y-4", isCollapsed && "px-1")}>
+        {/* Main Navigation Group */}
         <SidebarGroup>
-            <SidebarGroupContent>
-                <SidebarMenu>
-                    {mainNav.map((item) => (
-                        <SidebarMenuItem key={item.name}>
-                            <SidebarMenuButton asChild
-                            isActive={pathname === item.href}
-                            tooltip={item.name}
-                            className="rounded-xl data-[active=true]:bg-primary/10 data-[active=true]:text-primary hover:bg-white/10 transition-colors py-5"
-                            >
-                                <Link href={item.href}>
-                                    <item.icon className="size-5 opacity-80" />
-                                    <span className='text-sm font-semibold'>{item.name}</span>
-                                </Link>
-                            </SidebarMenuButton>
-                        </SidebarMenuItem>
-                    ))}
-                </SidebarMenu>
-            </SidebarGroupContent>
+          <SidebarGroupLabel className='text-xs font-semibold uppercase tracking-wider text-muted-foreground/80 px-2'>
+            {!isCollapsed && "Workspace"}
+          </SidebarGroupLabel>
+          <SidebarGroupContent>
+            <SidebarMenu className="gap-1">
+              {mainNav.map((item) => {
+                const isActive = pathname === item.href || (item.href !== "/dashboard" && pathname.startsWith(item.href));
+                return (
+                  <SidebarMenuItem key={item.name}>
+                    <SidebarMenuButton asChild
+                      isActive={isActive}
+                      tooltip={item.name}
+                      className={cn(
+                        "rounded-lg transition-colors py-2 px-3",
+                        isActive 
+                          ? "bg-primary/10 text-primary font-semibold dark:bg-primary/20" 
+                          : "text-muted-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
+                      )}
+                    >
+                      <Link href={item.href} className="flex items-center gap-3">
+                        <item.icon className="size-4.5 shrink-0" />
+                        <span className='text-sm font-medium'>{item.name}</span>
+                      </Link>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                );
+              })}
+            </SidebarMenu>
+          </SidebarGroupContent>
         </SidebarGroup>
 
-         {connectedChannels.length > 0 && (
-         <SidebarGroup className={cn(isCollapsed && "px-1", "mt-4")}>
-          <SidebarGroupLabel className='text-xs font-bold uppercase tracking-widest text-muted-foreground/70'>Channels</SidebarGroupLabel>
-          <SidebarGroupContent>
-            <SidebarMenu>
-               {isPending ? (
-                <div className='flex flex-col gap-2'>
-                  <Skeleton className='h-8 w-full bg-secondary' />
-                  <Skeleton className='h-8 w-full bg-secondary' />
-                  <Skeleton className='h-8 w-full bg-secondary' />
-                  <Skeleton className='h-8 w-full bg-secondary' />
-                </div>
-              ) : (
-                connectedChannels?.map((channel: ChannelType) => {
-                  const url = getChannelUrl(channel.type)
-                  return (
-                    <SidebarMenuItem key={channel.id}>
-                      <SidebarMenuButton asChild>
-                       <a
-                         href={`${url}/${channel.handle}`}
-                         target="_blank" rel="noreferrer"
-                          className="w-full! relative block items-center gap-2"
-                       >
-                           <ChannelAvatar
-                            size="sm"
-                           className="w-full flex items-center gap-2"
-                            type={channel.type}
-                            color={channel.color}
-                            profileImage={channel.profile_image}
-                            name={!isCollapsed ? (channel.handle || channel.name) : ""}
-                           />
-                       </a>
-                      </SidebarMenuButton>
-                    </SidebarMenuItem>
-                  )
-                })
-              )}
-            </SidebarMenu>
-          </SidebarGroupContent>
-         </SidebarGroup>
-         )}
+        {/* Connected Channels */}
+        {connectedChannels.length > 0 && (
+          <SidebarGroup>
+            <SidebarGroupLabel className='text-xs font-semibold uppercase tracking-wider text-muted-foreground/80 px-2'>
+              {!isCollapsed && "Connected Channels"}
+            </SidebarGroupLabel>
+            <SidebarGroupContent>
+              <SidebarMenu className="gap-1">
+                {isPending ? (
+                  <div className='flex flex-col gap-1.5 px-2'>
+                    <Skeleton className='h-7 w-full' />
+                    <Skeleton className='h-7 w-full' />
+                  </div>
+                ) : (
+                  connectedChannels.map((channel: ChannelType) => {
+                    const url = getChannelUrl(channel.type);
+                    return (
+                      <SidebarMenuItem key={channel.id}>
+                        <SidebarMenuButton asChild tooltip={channel.name}>
+                          <a
+                            href={`${url}/${channel.handle}`}
+                            target="_blank" 
+                            rel="noreferrer"
+                            className="w-full flex items-center gap-2.5 px-2 py-1.5 rounded-lg hover:bg-sidebar-accent transition-colors"
+                          >
+                            <ChannelAvatar
+                              size="sm"
+                              className="shrink-0"
+                              type={channel.type}
+                              color={channel.color}
+                              profileImage={channel.profile_image}
+                              name={!isCollapsed ? (channel.handle || channel.name) : ""}
+                            />
+                            {!isCollapsed && (
+                              <span className="text-xs truncate font-medium text-foreground">
+                                {channel.handle || channel.name}
+                              </span>
+                            )}
+                          </a>
+                        </SidebarMenuButton>
+                      </SidebarMenuItem>
+                    );
+                  })
+                )}
+              </SidebarMenu>
+            </SidebarGroupContent>
+          </SidebarGroup>
+        )}
 
-         <SidebarGroup className={cn(isCollapsed && "px-1", "mt-4")}>
-          <SidebarGroupLabel className='text-xs font-bold uppercase tracking-widest text-muted-foreground/70'>Connect Channels</SidebarGroupLabel>
-          <SidebarGroupContent>
-            <SidebarMenu>
-              {isPending ? (
-                <div className='flex flex-col gap-2'>
-                  <Skeleton className='h-8 w-full bg-secondary' />
-                  <Skeleton className='h-8 w-full bg-secondary' />
-                  <Skeleton className='h-8 w-full bg-secondary' />
-                  <Skeleton className='h-8 w-full bg-secondary' />
-                </div>
-              ) : (
-                <>
+        {/* Connect More Channels */}
+        {limitedChannels.length > 0 && (
+          <SidebarGroup>
+            <SidebarGroupLabel className='text-xs font-semibold uppercase tracking-wider text-muted-foreground/80 px-2'>
+              {!isCollapsed && "Connect Channels"}
+            </SidebarGroupLabel>
+            <SidebarGroupContent>
+              <SidebarMenu className="gap-1">
                 {limitedChannels.map((channel: ChannelType) => {
-                  const icon = getChannelIcon(channel.type)
+                  const icon = getChannelIcon(channel.type);
                   return (
                     <SidebarMenuItem key={channel.id}>
-                      <SidebarMenuButton asChild
-                       tooltip={`Connect ${channel.name}`}
-                      >
-                       <button
-                        className='w-full flex items-center gap-2'
-                        disabled={connectMutation.isPending}
-                        onClick={() => handleConnect(channel.id)}
-                       >
-                          <span>
-                             <div className='relative'>
-                              {icon ? (
-                                <HugeiconsIcon icon={icon} color='currentColor'
-                                className=" text-white! size-6! p-1 rounded-sm"
-                                  style={{ background: channel.color}}
-                                />
-                              ) : null}
-
-                              <div className={`absolute -right-1 bottom-0 p-0.5
-                                 bg-white dark:bg-background rounded-xs
-                                `}>
-                                  <HugeiconsIcon icon={PlusSignIcon} className="size-2!" />
-                                </div>
-                             </div>
-                          </span>
-                          <span className='truncate'>{channel.name}</span>
-                       </button>
+                      <SidebarMenuButton asChild tooltip={`Connect ${channel.name}`}>
+                        <button
+                          className='w-full flex items-center gap-2.5 px-2 py-1.5 rounded-lg hover:bg-sidebar-accent transition-colors text-left'
+                          disabled={connectMutation.isPending}
+                          onClick={() => handleConnect(channel.id)}
+                        >
+                          <div className='relative shrink-0'>
+                            {icon ? (
+                              <HugeiconsIcon 
+                                icon={icon} 
+                                color='currentColor'
+                                className="text-white size-5 p-0.5 rounded-sm"
+                                style={{ background: channel.color }}
+                              />
+                            ) : null}
+                            <div className="absolute -right-1 -bottom-0.5 p-0.5 bg-background rounded-xs border border-border">
+                              <HugeiconsIcon icon={PlusSignIcon} className="size-2 text-muted-foreground" />
+                            </div>
+                          </div>
+                          {!isCollapsed && (
+                            <span className='text-xs truncate text-muted-foreground hover:text-foreground font-medium'>
+                              {channel.name}
+                            </span>
+                          )}
+                        </button>
                       </SidebarMenuButton>
                     </SidebarMenuItem>
-                  )
+                  );
                 })}
                 <SidebarMenuItem>
-                  <SidebarMenuButton asChild>
-                    <Button asChild variant="ghost" className='w-full justify-start mt-1'>
-                      <Link href="/settings" className='w-full flex items-center gap-2'>
-                      <PlusCircleIcon className='size-4'  />
-                      <span className='text-sm'>More channels</span>
-                      </Link>
-                    </Button>
+                  <SidebarMenuButton asChild tooltip="All Channels">
+                    <Link href="/settings" className='w-full flex items-center gap-2 px-2 py-1.5 text-xs text-primary font-medium hover:underline'>
+                      <PlusCircleIcon className='size-3.5' />
+                      {!isCollapsed && <span>More channels</span>}
+                    </Link>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
-                </>
-              )}
+              </SidebarMenu>
+            </SidebarGroupContent>
+          </SidebarGroup>
+        )}
+
+        {/* Secondary Navigation */}
+        <SidebarGroup className="mt-auto pt-2 border-t border-sidebar-border/60">
+          <SidebarGroupContent>
+            <SidebarMenu className="gap-1">
+              {secondaryNav.map((item) => (
+                <SidebarMenuItem key={item.name}>
+                  <SidebarMenuButton asChild
+                    isActive={pathname === item.href}
+                    tooltip={item.name}
+                    className="rounded-lg text-muted-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground transition-colors py-2 px-3"
+                  >
+                    <Link href={item.href} className="flex items-center gap-3">
+                      <item.icon className="size-4 shrink-0" />
+                      <span className='text-sm font-medium'>{item.name}</span>
+                    </Link>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              ))}
             </SidebarMenu>
           </SidebarGroupContent>
-         </SidebarGroup>
+        </SidebarGroup>
       </SidebarContent>
-      <SidebarFooter className="bg-transparent p-4">
-         <div className="mb-4 text-xs font-semibold text-muted-foreground/70 uppercase tracking-widest">
-          <span>
-            {connectedCount}/{totalChannels} channels connected
-          </span>
-        </div>
-        <div className="flex items-center gap-2">
+
+      <SidebarFooter className="border-t border-sidebar-border/60 p-3 bg-sidebar">
+        {!isCollapsed && (
+          <div className="mb-2 px-1 text-[11px] font-semibold text-muted-foreground uppercase tracking-wider flex items-center justify-between">
+            <span>Channels Sync</span>
+            <span className="text-foreground">{connectedCount}/{totalChannels}</span>
+          </div>
+        )}
+        <div className="flex items-center gap-2.5 px-1 py-1">
           <UserButton
             showName={false}
             appearance={{
               elements: {
-                avatarBox: "h-8 w-8",
+                avatarBox: "h-7 w-7",
               },
             }}
           />
-          <span className="text-sm">{user?.fullName || user?.primaryEmailAddress?.emailAddress}</span>
+          {!isCollapsed && (
+            <div className="flex flex-col min-w-0">
+              <span className="text-xs font-semibold text-foreground truncate">
+                {user?.fullName || "User Account"}
+              </span>
+              <span className="text-[11px] text-muted-foreground truncate">
+                {user?.primaryEmailAddress?.emailAddress}
+              </span>
+            </div>
+          )}
         </div>
       </SidebarFooter>
     </Sidebar>
-     <CreatePostDialog
-        open={isCreatePostOpen}
-        onOpenChange={setIsCreatePostOpen}
-      />
+    
+    <CreatePostDialog
+      open={isCreatePostOpen}
+      onOpenChange={setIsCreatePostOpen}
+    />
     </>
-  )
-}
+  );
+};
 
-export default AppSidebar
+export default AppSidebar;
