@@ -384,10 +384,10 @@ const CreatePostDialog = ({ open, onOpenChange, selectedDate }: PropsType) => {
                                                                 {Icon ? (
                                                                     <HugeiconsIcon icon={Icon} className="size-3.5" color="currentColor" />
                                                                 ) : (
-                                                                    <span className="text-[10px] font-bold">{channel.name[0]}</span>
+                                                                    <span className="text-[10px] font-bold">{channel.name?.[0] || "P"}</span>
                                                                 )}
                                                             </div>
-                                                            <span className="truncate max-w-[90px]">{channel.handle || channel.name}</span>
+                                                            <span className="truncate max-w-[90px]">{channel.handle || channel.name || "Channel"}</span>
                                                             {selected && (
                                                                 <span className="size-1.5 rounded-full bg-primary shrink-0" />
                                                             )}

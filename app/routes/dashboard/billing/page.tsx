@@ -5,7 +5,6 @@ import { Card, CardContent } from "@/components/ui/card"
 import { useQuery } from "@tanstack/react-query"
 import { CheckCircle2, CreditCard, Layers, Send, Sparkles, Zap } from "lucide-react"
 import { Spinner } from "@/components/ui/spinner"
-import { Progress } from "@/components/ui/progress"
 
 const BillingPage = () => {
   const { data: totalsData, isPending: isTotalsPending } = useQuery({
@@ -89,7 +88,9 @@ const BillingPage = () => {
                   <span className="text-lg font-bold text-foreground">Scheduled Posts</span>
                 </div>
                 <div className="mt-3 space-y-1.5">
-                  <Progress value={postProgress} className="h-2" />
+                  <div className="h-2 w-full rounded-full bg-muted overflow-hidden">
+                    <div className="h-full bg-primary rounded-full transition-all" style={{ width: `${postProgress}%` }} />
+                  </div>
                   <p className="text-[11px] text-muted-foreground">
                     {totalPosts >= maxFreePosts 
                       ? "Limit reached on free tier. Upgrade for unlimited scheduling."
@@ -118,7 +119,9 @@ const BillingPage = () => {
                   <span className="text-lg font-bold text-foreground">Social Accounts</span>
                 </div>
                 <div className="mt-3 space-y-1.5">
-                  <Progress value={Math.round((connectedCount / 8) * 100)} className="h-2" />
+                  <div className="h-2 w-full rounded-full bg-muted overflow-hidden">
+                    <div className="h-full bg-primary rounded-full transition-all" style={{ width: `${Math.round((connectedCount / 8) * 100)}%` }} />
+                  </div>
                   <p className="text-[11px] text-muted-foreground">
                     8 channels supported (Twitter, LinkedIn, TikTok, IG, FB, Threads, Bluesky, YT).
                   </p>

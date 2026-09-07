@@ -1,3 +1,4 @@
+"use client"
 import { useEffect, useState, useMemo } from "react"
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { MoreHorizontal, Plus, Search, Share2, Trash2, Edit2 } from "lucide-react"

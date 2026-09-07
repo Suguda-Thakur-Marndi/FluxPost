@@ -6,7 +6,7 @@ import { usePathname } from "next/navigation";
 import { useAuth, UserButton } from "@clerk/nextjs";
 import Logo from "@/components/logo";
 import { Button } from "@/components/ui/button";
-import { ModeToggle } from "@/components/mode-toggle";
+import { ModeToggle } from "@/components/dark-mode-toggle";
 import { Menu, X, ArrowRight } from "lucide-react";
 
 const navItems = [
