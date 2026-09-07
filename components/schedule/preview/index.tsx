@@ -7,6 +7,7 @@ import { InfoIcon } from "lucide-react"
 import { ThreadPreview } from "./thread-preview"
 import { LinkedinPreview } from "./linkedin-preview"
 import { YoutubePreview } from "./youtube-preview"
+import { TikTokPreview } from "./tiktok-preview"
 import { ImageObject } from "@/types/post.type"
 import { ChannelTypeEnum } from "@/constants/channels"
 
@@ -42,13 +43,13 @@ const PreviewPanel = ({
         profileImage={channel?.profile_image || ""}
         handle={channel?.handle || ""}
         />
-        case ChannelTypeEnum.LINKEDIN:
-          return <LinkedinPreview
-            text={content.text}
-            images={imageUrls}
-            profileImage={channel?.profile_image || ""}
-        handle={channel?.handle || ""}
-          />
+      case ChannelTypeEnum.LINKEDIN:
+        return <LinkedinPreview
+          text={content.text}
+          images={imageUrls}
+          profileImage={channel?.profile_image || ""}
+          handle={channel?.handle || ""}
+        />
       case ChannelTypeEnum.INSTAGRAM:
         return <InstagramPreview
           text={content.text}
@@ -73,6 +74,13 @@ const PreviewPanel = ({
         return <YoutubePreview
           text={content.text}
           images={imageUrls}
+        />
+      case ChannelTypeEnum.TIKTOK:
+        return <TikTokPreview
+          text={content.text}
+          images={imageUrls}
+          handle={channel?.handle || ""}
+          profileImage={channel?.profile_image || ""}
         />
       default:
         return <div></div>

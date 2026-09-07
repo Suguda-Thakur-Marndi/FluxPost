@@ -262,35 +262,38 @@ export function EditPostDialog({
 
                 </div>
 
-                <DialogFooter className="px-8 pt-4 pb-4 m-0!">
-                    <div className="w-full flex items-center justify-between gap-2">
+                <DialogFooter className="px-8 py-3.5 border-t border-border bg-card/60 flex flex-row items-center justify-between gap-3 m-0!">
+                    <div className="w-full flex items-center justify-between gap-3">
                         <Button
                             variant="ghost"
-                            size="lg"
+                            size="sm"
+                            className="text-muted-foreground hover:text-foreground font-medium text-xs h-9 px-3"
                             onClick={() => handleUpdate(POST_STATUS.DRAFT)}
                             disabled={updatePostMutation.isPending}
                         >
-                            {updatePostMutation.isPending && updatePostMutation.variables?.status === POST_STATUS.DRAFT && <Spinner />}
+                            {updatePostMutation.isPending && updatePostMutation.variables?.status === POST_STATUS.DRAFT && <Spinner className="mr-1.5 size-3.5" />}
                             Save Draft
                         </Button>
                         <ButtonGroup className="p-0!">
                             <ScheduleDatePicker
                                 date={date} setDate={setDate} time={time} setTime={setTime}
-                                renderButton={(isDatePassed, isTimeNotAvailable) => <Button
-                                    size="lg"
-                                    className="border py-4.5 px-4"
-                                    onClick={() => {
-                                        if (isDatePassed || isTimeNotAvailable) {
-                                            toast.error("Please select a valid time")
-                                            return;
-                                        }
-                                        handleUpdate()
-                                    }}
-                                    disabled={updatePostMutation.isPending || !date || !time || isTimeNotAvailable || isDatePassed}
-                                >
-                                    {updatePostMutation.isPending && updatePostMutation.variables?.status === undefined && <Spinner />}
-                                    Schedule Post
-                                </Button>}
+                                renderButton={(isDatePassed, isTimeNotAvailable) => (
+                                    <Button
+                                        size="sm"
+                                        className="shadow-xs font-semibold text-xs h-9 px-4 bg-primary text-primary-foreground hover:bg-primary/90 transition-all cursor-pointer"
+                                        onClick={() => {
+                                            if (isDatePassed || isTimeNotAvailable) {
+                                                toast.error("Please select a valid time")
+                                                return;
+                                            }
+                                            handleUpdate()
+                                        }}
+                                        disabled={updatePostMutation.isPending || !date || !time || isTimeNotAvailable || isDatePassed}
+                                    >
+                                        {updatePostMutation.isPending && updatePostMutation.variables?.status === undefined && <Spinner className="mr-1.5 size-3.5" />}
+                                        Update Schedule
+                                    </Button>
+                                )}
                             />
                         </ButtonGroup>
                     </div>

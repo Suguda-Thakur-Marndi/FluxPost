@@ -1,8 +1,6 @@
-"use client"
-
-import { useEffect, useState } from "react"
+import { useEffect, useState, useMemo } from "react"
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
-import { MoreHorizontal, Plus } from "lucide-react"
+import { MoreHorizontal, Plus, Search, Share2, Trash2, Edit2 } from "lucide-react"
 import {
     DragDropContext,
     Droppable,
@@ -15,15 +13,17 @@ import React from "react"
 import { toast } from "sonner"
 import { Button } from "../ui/button"
 import { Skeleton } from "../ui/skeleton"
+import { Input } from "../ui/input"
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { ImageObject } from "@/types/post.type"
 import { Badge } from "../ui/badge"
 import { cn } from "@/lib/utils"
-import { Card, CardContent, CardHeader } from "../ui/card"
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "../ui/dropdown-menu"
+import { Card, CardContent } from "../ui/card"
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "../ui/dropdown-menu"
 import IdeaDialog from "./idea-dialog"
 import { IdeaType } from "@/types/idea.type"
 import { GenerateIdeasPopover } from "./generate-ideas-popover"
+import CreatePostDialog from "../schedule/create-post-dialog"
 
 type Column = {
     id: string
@@ -34,9 +34,11 @@ type Column = {
 const IdeaKanban = () => {
     const queryClient = useQueryClient()
     const [columns, setColumns] = useState<Column[]>([])
+    const [searchQuery, setSearchQuery] = useState<string>("")
     const [showIdeaDialog, setShowIdeaDialog] = useState<boolean>(false)
     const [selectedIdea, setSelectedIdea] = useState<IdeaType | null>(null)
     const [selectedColumnId, setSelectedColumnId] = useState<string>("")
+    const [isCreatePostOpen, setIsCreatePostOpen] = useState<boolean>(false)
 
     const { data: ideaData, isPending } = useQuery({
         queryKey: ["ideas"],
@@ -246,75 +248,99 @@ const IdeaKanban = () => {
         });
     }
 
+    const filteredColumns = useMemo(() => {
+        if (!searchQuery.trim()) return columns;
+        const q = searchQuery.toLowerCase();
+        return columns.map(col => ({
+            ...col,
+            ideas: col.ideas.filter(idea => 
+                idea.title.toLowerCase().includes(q) || 
+                (idea.description && idea.description.toLowerCase().includes(q))
+            )
+        }));
+    }, [columns, searchQuery]);
+
     return (
         <>
-            <div className="flex flex-col overflow-hidden">
-                <header className="flex items-center justify-between border-b px-6 py-4">
+            <div className="flex flex-col h-full overflow-hidden">
+                <header className="flex flex-col sm:flex-row sm:items-center justify-between border-b border-border/60 px-6 py-4 gap-4 bg-background">
                     <div>
-                        <h1 className="text-xl font-semibold">Ideas</h1>
-                        <p className="text-sm text-muted-foreground">
-                            Capture and organize your content ideas
+                        <div className="flex items-center gap-2">
+                            <h1 className="text-xl font-bold tracking-tight text-foreground">Content Ideas Board</h1>
+                            <Badge variant="outline" className="text-xs font-semibold">
+                                {columns.reduce((acc, c) => acc + c.ideas.length, 0)} Ideas
+                            </Badge>
+                        </div>
+                        <p className="text-xs text-muted-foreground mt-0.5">
+                            Capture, brainstorm, and organize raw concepts into scheduled social posts.
                         </p>
                     </div>
-                    <div className="flex items-center gap-3">
-                        { }
+
+                    <div className="flex items-center gap-2.5 flex-wrap">
+                        <div className="relative w-48 sm:w-64">
+                            <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 size-3.5 text-muted-foreground" />
+                            <Input
+                                placeholder="Search ideas..."
+                                value={searchQuery}
+                                onChange={(e) => setSearchQuery(e.target.value)}
+                                className="h-8 pl-8 text-xs bg-muted/30"
+                            />
+                        </div>
                         <GenerateIdeasPopover onGenerated={handleGeneratedIdea} />
-                        <Button variant="outline" className="gap-2"
+                        <Button 
                             onClick={() => handleAddIdea(columns[0]?.id ?? "")}
+                            size="sm"
+                            className="bg-primary text-primary-foreground font-semibold shadow-xs hover:bg-primary/90 gap-1.5 h-8 text-xs"
                         >
-                            <Plus className="h-4 w-4" />
-                            New Idea
+                            <Plus className="size-3.5" />
+                            <span>New Idea</span>
                         </Button>
                     </div>
                 </header>
 
-                <div className="h-[calc(100vh-120px)]">
-                    <div className="kanban--board relative py-6 flex-1 h-full overflow-hidden">
+                <div className="flex-1 overflow-hidden p-6">
+                    <div className="kanban--board relative h-full overflow-hidden">
                         {isPending ? (
                             <div className="flex gap-4 w-full h-full items-start">
                                 {[1, 2, 3, 4].map((i) => (
-                                    <div key={i} className="shrink-0 w-[280px] flex flex-col h-full min-h-0
-                rounded-lg bg-[#f7f6f3] dark:bg-neutral-800/40 border p-3">
-                                        <div className="flex items-center justify-between pb-3">
+                                    <div key={i} className="shrink-0 w-[290px] flex flex-col h-full min-h-0 rounded-xl bg-card border border-border/70 p-3.5 space-y-3">
+                                        <div className="flex items-center justify-between pb-2">
                                             <Skeleton className="h-5 w-24" />
                                             <Skeleton className="h-5 w-6 rounded-full" />
                                         </div>
                                         <div className="flex-1 space-y-3">
-                                            <Skeleton className="h-[100px] w-full rounded-sm" />
-                                            <Skeleton className="h-[120px] w-full rounded-sm" />
-                                            <Skeleton className="h-[80px] w-full rounded-sm" />
+                                            <Skeleton className="h-[90px] w-full rounded-lg" />
+                                            <Skeleton className="h-[110px] w-full rounded-lg" />
+                                            <Skeleton className="h-[75px] w-full rounded-lg" />
                                         </div>
                                     </div>
                                 ))}
                             </div>
                         ) : (
-                            <div className="h-full overflow-x-auto">
+                            <div className="h-full overflow-x-auto pb-2">
                                 <DragDropContext onDragEnd={handleDragEnd}>
-                                    <div
-                                        style={{ height: "100%" }}
-                                        className="flex gap-4 w-full"
-                                    >
-                                        {columns?.map((column) => (
+                                    <div className="flex gap-4 h-full items-start">
+                                        {filteredColumns?.map((column) => (
                                             <div
                                                 key={column.id}
-                                                className="shrink-0 w-[280px] flex flex-col h-full min-h-0
-rounded-lg bg-[#f7f6f3] dark:bg-neutral-800/40 border p-3"
+                                                className="shrink-0 w-[290px] flex flex-col max-h-full rounded-xl bg-card border border-border/80 shadow-xs p-3.5"
                                             >
-                                                <div className="flex items-center justify-between px-3 pt-3 pb-2">
+                                                <div className="flex items-center justify-between pb-3">
                                                     <div className="flex items-center gap-2">
-                                                        <h3 className="font-bold text-sm">
+                                                        <h3 className="font-semibold text-xs text-foreground uppercase tracking-wider">
                                                             {column.title}
                                                         </h3>
-                                                        <Badge variant="secondary">
+                                                        <Badge variant="secondary" className="text-[10px] h-4.5 px-1.5 font-bold">
                                                             {column.ideas.length}
                                                         </Badge>
                                                     </div>
-                                                    <Button size="icon"
+                                                    <Button 
+                                                        size="icon"
                                                         variant="ghost"
-                                                        className="size-7"
+                                                        className="size-6 text-muted-foreground hover:text-foreground"
                                                         onClick={() => handleAddIdea(column.id)}
                                                     >
-                                                        <Plus className="w-4 h-4" />
+                                                        <Plus className="size-3.5" />
                                                     </Button>
                                                 </div>
 
@@ -324,114 +350,117 @@ rounded-lg bg-[#f7f6f3] dark:bg-neutral-800/40 border p-3"
                                                             ref={provided.innerRef}
                                                             {...provided.droppableProps}
                                                             className={cn(
-                                                                `flex-1 overflow-y-auto overflow-x-hidden
-p-2 px-3 transition-colors min-h-0`,
+                                                                "flex-1 overflow-y-auto overflow-x-hidden p-1 space-y-2.5 transition-colors min-h-[120px] rounded-lg",
                                                                 snapshot.isDraggingOver
-                                                                    ? "bg-primary/20 border-2 border-dashed border-primary"
+                                                                    ? "bg-primary/5 border-2 border-dashed border-primary/40"
                                                                     : "bg-transparent",
-
+                                                            )}
+                                                        >
+                                                            {column.ideas.length === 0 && !snapshot.isDraggingOver && (
+                                                                <div className="p-4 text-center border border-dashed border-border/60 rounded-lg text-xs text-muted-foreground my-2">
+                                                                    No ideas yet
+                                                                </div>
                                                             )}
 
-                                                        >
+                                                            <div className="space-y-2.5">
+                                                                {column?.ideas.map((idea, index) => (
+                                                                    <Draggable
+                                                                        key={idea.id || `idea-${index}`}
+                                                                        draggableId={idea.id || `idea-${index}`}
+                                                                        index={index}
+                                                                    >
+                                                                        {(provided, snapshot) => (
+                                                                            <Card
+                                                                                ref={provided.innerRef}
+                                                                                {...provided.draggableProps}
+                                                                                {...provided.dragHandleProps}
+                                                                                style={provided.draggableProps.style as React.CSSProperties}
+                                                                                className={cn(
+                                                                                    "group cursor-pointer rounded-xl border border-border/70 bg-card p-3 shadow-2xs hover:border-slate-300 dark:hover:border-slate-700 hover:shadow-xs active:cursor-grabbing transition-all select-none",
+                                                                                    snapshot.isDragging && "scale-95 rotate-1 shadow-lg ring-2 ring-primary/30"
+                                                                                )}
+                                                                                onClick={() => handleEditIdea(idea, column.id)}
+                                                                            >
+                                                                                <CardContent className="p-0 space-y-2">
+                                                                                    {idea.images && idea.images.length > 0 && (
+                                                                                        <div className="grid grid-cols-4 gap-1.5 rounded-lg overflow-hidden">
+                                                                                            {idea.images.slice(0, 4).map((image, index) => (
+                                                                                                // eslint-disable-next-line @next/next/no-img-element
+                                                                                                <img
+                                                                                                    key={index}
+                                                                                                    src={image.url}
+                                                                                                    alt={idea.title}
+                                                                                                    className="w-full h-12 rounded-md object-cover border border-border/60"
+                                                                                                />
+                                                                                            ))}
+                                                                                        </div>
+                                                                                    )}
 
-                                    <div className="space-y-2">
-                                    {column?.ideas.map((idea, index) => (
-                                        <Draggable
-                                            key={idea.id || `idea-${index}`}
-                                            draggableId={idea.id || `idea-${index}`}
-                                            index={index}>
+                                                                                    <div className="flex items-start justify-between gap-2">
+                                                                                        <h4 className="font-semibold text-xs text-foreground line-clamp-2">
+                                                                                            {idea.title}
+                                                                                        </h4>
+                                                                                        <DropdownMenu>
+                                                                                            <DropdownMenuTrigger asChild onClick={(e) => e.stopPropagation()}>
+                                                                                                <Button
+                                                                                                    size="icon"
+                                                                                                    variant="ghost"
+                                                                                                    className="size-6 text-muted-foreground hover:text-foreground opacity-0 group-hover:opacity-100 transition-opacity"
+                                                                                                >
+                                                                                                    <MoreHorizontal className="size-3.5" />
+                                                                                                </Button>
+                                                                                            </DropdownMenuTrigger>
+                                                                                            <DropdownMenuContent align="end" className="w-44 text-xs">
+                                                                                                <DropdownMenuItem onClick={() => handleEditIdea(idea, column.id)}>
+                                                                                                    <Edit2 className="size-3.5 mr-2" />
+                                                                                                    Edit Idea
+                                                                                                </DropdownMenuItem>
+                                                                                                <DropdownMenuItem onClick={() => {
+                                                                                                    setSelectedIdea(idea);
+                                                                                                    setIsCreatePostOpen(true);
+                                                                                                }}>
+                                                                                                    <Share2 className="size-3.5 mr-2 text-primary" />
+                                                                                                    Turn into Post
+                                                                                                </DropdownMenuItem>
+                                                                                                <DropdownMenuSeparator />
+                                                                                                <DropdownMenuItem
+                                                                                                    className="text-red-600 dark:text-red-400 font-semibold cursor-pointer"
+                                                                                                    disabled={deleteIdeaMutation.isPending}
+                                                                                                    onSelect={() => handleDeleteIdea(column.id, idea.id || "")}
+                                                                                                >
+                                                                                                    <Trash2 className="size-3.5 mr-2" />
+                                                                                                    Delete Idea
+                                                                                                </DropdownMenuItem>
+                                                                                            </DropdownMenuContent>
+                                                                                        </DropdownMenu>
+                                                                                    </div>
 
-                                            {(provided, snapshot) => (
-                                                <Card
-                                                    ref={provided.innerRef}
-                                                    {...provided.draggableProps}
-                                                    {...provided.dragHandleProps}
-                                                    style={provided.draggableProps.style as React.CSSProperties}
-                                                    className={cn(
-                                                        "group cursor-pointer! shadow-sm rounded-sm! active:cursor-grabbing transform transition-all",
-                                                        snapshot.isDragging &&
-                                                        "scale-95 rotate-1 shadow-lg",
-                                                    )}
-                                                    onClick={() => handleEditIdea(idea, column.id)}
-                                                >
-                                                    <CardContent>
-                                                        {idea.images && idea.images?.length > 0 && (
-                                                            <div className="grid grid-cols-4 gap-1 mb-2">
-                                                                {idea.images.slice(0, 4).map((image, index) => (
-                                                                    // eslint-disable-next-line @next/next/no-img-element
-                                                                    <img
-                                                                        key={index}
-                                                                        src={image.url}
-                                                                        alt={idea.title}
-                                                                        className="w-full h-12 rounded object-cover
-                                    border"
-                                                                    />
+                                                                                    {idea.description && (
+                                                                                        <p className="text-[11px] text-muted-foreground line-clamp-2 leading-relaxed">
+                                                                                            {idea.description}
+                                                                                        </p>
+                                                                                    )}
+                                                                                </CardContent>
+                                                                            </Card>
+                                                                        )}
+                                                                    </Draggable>
                                                                 ))}
                                                             </div>
-                                                        )}
-                                                        <CardHeader className="mb-1 p-0">
-                                                            <div className="flex items-start justify-between">
-                                                                <div>
-                                                                    <h4 className="font-semibold text-sm">{idea.title}</h4>
-                                                                </div>
-                                                                <DropdownMenu>
-                                                                    <DropdownMenuTrigger>
-                                                                        <Button
-                                                                            size="icon"
-                                                                            variant="ghost"
-                                                                            className="h-6 w-6 opacity-0 group-hover:opacity-100"
-                                                                        >
-                                                                            <MoreHorizontal className="h-3.5 w-3.5" />
-                                                                        </Button>
-                                                                    </DropdownMenuTrigger>
-                                                                    <DropdownMenuContent>
-                                                                        <DropdownMenuItem onClick={() => handleEditIdea(idea, column.id)}>
-                                                                            Edit
-                                                                        </DropdownMenuItem>
-                                                                        <DropdownMenuItem
-                                                                            className="text-destructive"
-                                                                            disabled={deleteIdeaMutation.isPending}
-                                                                            onSelect={() => {
-                                                                                handleDeleteIdea(
-                                                                                    column.id,
-                                                                                    idea.id || ""
-                                                                                )
-                                                                            }}
-                                                                        >
-                                                                            Delete
-                                                                        </DropdownMenuItem>
-                                                                    </DropdownMenuContent>
-                                                                </DropdownMenu>
-                                                            </div>
-                                                        </CardHeader>
 
-                                                        {idea.description && (
-                                                            <p className="text-xs text-muted-foreground line-clamp-2">
-                                                                {idea.description}
-                                                            </p>
-                                                        )}
-                                                    </CardContent>
-                                                </Card>
-                                            )}
-                                        </Draggable>
-                                    ))}
-                                    </div>
+                                                            <Button
+                                                                variant="ghost"
+                                                                onClick={() => handleAddIdea(column.id)}
+                                                                className="w-full text-xs h-8 text-muted-foreground hover:text-foreground mt-2 border border-dashed border-border/60 hover:border-border"
+                                                            >
+                                                                <Plus className="size-3 mr-1.5" />
+                                                                Add Idea
+                                                            </Button>
 
-                                    <Button
-                                    variant="ghost"
-                                    onClick={() => handleAddIdea(column.id)}
-                                    className="w-full border-none! h-12! mt-2.5"
-                                    >
-                                    <Plus className="h-4 w-4" />
-                                    New Idea
-                                    </Button>
-
-                                    {provided.placeholder}
-                                    </div>
+                                                            {provided.placeholder}
+                                                        </div>
                                                     )}
                                                 </Droppable>
                                             </div>
-
                                         ))}
                                     </div>
                                 </DragDropContext>
@@ -440,6 +469,11 @@ p-2 px-3 transition-colors min-h-0`,
                     </div>
                 </div>
             </div>
+
+            <CreatePostDialog
+                open={isCreatePostOpen}
+                onOpenChange={setIsCreatePostOpen}
+            />
 
             <IdeaDialog
                 open={showIdeaDialog}

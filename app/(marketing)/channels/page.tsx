@@ -1,11 +1,12 @@
 "use client";
 
 import Link from "next/link";
-import { motion } from "framer-motion";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { ChannelTypeEnum, getChannelIcon } from "@/constants/channels";
 import { Button } from "@/components/ui/button";
-import { Sparkles, ArrowRight, Check, Zap, Shield, Image as ImageIcon } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { Card, CardContent } from "@/components/ui/card";
+import { ArrowRight, Check, Shield, Image as ImageIcon, CheckCircle2 } from "lucide-react";
 
 const channelsList = [
   {
@@ -25,8 +26,8 @@ const channelsList = [
   {
     type: ChannelTypeEnum.LINKEDIN,
     name: "LinkedIn",
-    tagline: "Thought leadership, career insights & company news.",
-    color: "#2867b2",
+    tagline: "Thought leadership, career insights & company updates.",
+    color: "#0A66C2",
     charLimit: "3,000 chars",
     mediaSupport: "Single & multi-image uploads",
     features: [
@@ -39,28 +40,42 @@ const channelsList = [
   {
     type: ChannelTypeEnum.INSTAGRAM,
     name: "Instagram",
-    tagline: "Visual storytelling, reels, carousels & hashtags.",
+    tagline: "Visual storytelling, carousels, reels & hashtags.",
     color: "#E4405F",
     charLimit: "2,200 chars",
     mediaSupport: "Carousel & single image posts",
     features: [
-      "Carousel swipe preview with interactive indicator",
+      "Carousel swipe preview with indicator",
       "AI hashtag generator & caption expander",
       "Direct publishing via Graph API",
       "Square & portrait media validation",
     ],
   },
   {
+    type: ChannelTypeEnum.TIKTOK,
+    name: "TikTok",
+    tagline: "Trending short videos, captions & viral hooks.",
+    color: "#000000",
+    charLimit: "2,200 chars",
+    mediaSupport: "Vertical video & cover preview",
+    features: [
+      "TikTok creator API integration",
+      "Viral hook AI suggestions",
+      "Trending hashtag explorer",
+      "9:16 mobile screen mockup preview",
+    ],
+  },
+  {
     type: ChannelTypeEnum.FACEBOOK,
     name: "Facebook",
-    tagline: "Community updates, rich links & group announcements.",
+    tagline: "Community updates, rich links & page announcements.",
     color: "#1877F2",
     charLimit: "63,206 chars",
     mediaSupport: "Multi-photo grid",
     features: [
       "Page and profile post scheduler",
       "Facebook feed mockup preview",
-      "Rich caption formatting and emoji support",
+      "Rich caption formatting",
       "Automated queue delivery",
     ],
   },
@@ -82,7 +97,7 @@ const channelsList = [
     type: ChannelTypeEnum.BLUESKY,
     name: "Bluesky",
     tagline: "Decentralized social networking on the AT Protocol.",
-    color: "#1285fe",
+    color: "#1285FE",
     charLimit: "300 chars",
     mediaSupport: "Up to 4 images",
     features: [
@@ -106,138 +121,101 @@ const channelsList = [
       "Title & description optimizer",
     ],
   },
-  {
-    type: ChannelTypeEnum.TIKTOK,
-    name: "TikTok",
-    tagline: "Trending short videos, captions & viral hooks.",
-    color: "#000000",
-    charLimit: "2,200 chars",
-    mediaSupport: "Video & cover preview",
-    features: [
-      "TikTok creator API integration",
-      "Viral hook AI suggestions",
-      "Trending hashtag explorer",
-      "Mobile screen mockup preview",
-    ],
-  },
 ];
 
 export default function ChannelsPage() {
   return (
-    <div className="py-20 px-6 max-w-7xl mx-auto">
+    <div className="py-16 md:py-24 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto space-y-20">
       {/* ── Header ────────────────────────────────────────── */}
-      <div className="text-center max-w-3xl mx-auto mb-20">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="inline-flex items-center gap-2 rounded-full glass-card px-5 py-2 text-sm font-medium border border-border/60 mb-6"
-        >
-          <Sparkles className="size-4 text-primary animate-pulse" />
-          <span className="text-foreground/80">Multi-Channel Social Hub</span>
-        </motion.div>
+      <div className="text-center max-w-3xl mx-auto space-y-4">
+        <Badge variant="outline" className="px-3.5 py-1 text-xs font-semibold rounded-full border-border bg-card">
+          Multi-Channel Social Hub
+        </Badge>
 
-        <motion.h1
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.1 }}
-          className="text-4xl sm:text-6xl font-black tracking-tight leading-tight"
-        >
-          Connect & schedule to <span className="text-gradient">all major networks</span>
-        </motion.h1>
+        <h1 className="text-4xl sm:text-5xl md:text-6xl font-extrabold tracking-tight text-foreground">
+          Connect & schedule across all 8 major networks.
+        </h1>
 
-        <motion.p
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2 }}
-          className="mt-6 text-lg text-muted-foreground font-medium leading-relaxed"
-        >
-          One unified dashboard to orchestrate your social presence across Twitter, LinkedIn, Instagram, Facebook, Threads, Bluesky, and YouTube.
-        </motion.p>
+        <p className="text-sm sm:text-base md:text-lg text-muted-foreground leading-relaxed">
+          One unified command center to orchestrate your social presence across Twitter/X, LinkedIn, Instagram, TikTok, Facebook, Threads, Bluesky, and YouTube.
+        </p>
       </div>
 
       {/* ── Channels Grid ─────────────────────────────────── */}
-      <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-4">
-        {channelsList.map((channel, idx) => {
+      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+        {channelsList.map((channel) => {
           const icon = getChannelIcon(channel.type);
           return (
-            <motion.div
-              key={channel.type}
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: idx * 0.08, duration: 0.5 }}
-              whileHover={{ y: -8 }}
-              className="flex flex-col justify-between rounded-[2rem] glass-card p-7 border border-white/10 shadow-xl backdrop-blur-xl transition-all"
+            <Card
+              key={channel.name}
+              className="surface-card flex flex-col justify-between p-6 hover:border-slate-300 dark:hover:border-slate-700 transition-all shadow-2xs"
             >
-              <div>
-                <div className="flex items-center justify-between mb-6">
-                  {icon && (
-                    <div
-                      className="size-14 rounded-2xl flex items-center justify-center text-white shadow-lg border border-white/20"
-                      style={{ backgroundColor: channel.color }}
-                    >
-                      <HugeiconsIcon icon={icon} color="currentColor" className="size-7" />
-                    </div>
-                  )}
-                  <span className="text-xs font-bold px-3 py-1 rounded-full bg-muted/60 text-muted-foreground border border-border/40">
-                    {channel.charLimit}
+              <CardContent className="p-0 flex flex-col justify-between h-full space-y-5">
+                <div>
+                  <div className="flex items-center justify-between mb-4">
+                    {icon && (
+                      <div
+                        className="size-11 rounded-xl flex items-center justify-center text-white shadow-xs"
+                        style={{ backgroundColor: channel.color }}
+                      >
+                        <HugeiconsIcon icon={icon} color="currentColor" className="size-5 text-white" />
+                      </div>
+                    )}
+                    <Badge variant="secondary" className="text-[10px] font-semibold">
+                      {channel.charLimit}
+                    </Badge>
+                  </div>
+
+                  <h3 className="text-base font-bold text-foreground mb-1">{channel.name}</h3>
+                  <p className="text-xs text-muted-foreground leading-relaxed">
+                    {channel.tagline}
+                  </p>
+
+                  <div className="space-y-2 mt-4 pt-4 border-t border-border/60">
+                    {channel.features.map((f, i) => (
+                      <div key={i} className="flex items-start gap-2 text-xs text-foreground/90">
+                        <Check className="size-3 text-primary shrink-0 mt-0.5" />
+                        <span>{f}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="pt-4 border-t border-border/60 flex items-center justify-between text-[11px] text-muted-foreground">
+                  <span className="flex items-center gap-1.5 truncate">
+                    <ImageIcon className="size-3 text-primary shrink-0" />
+                    <span className="truncate">{channel.mediaSupport}</span>
+                  </span>
+                  <span className="flex items-center gap-1 text-emerald-600 dark:text-emerald-400 font-semibold shrink-0">
+                    <CheckCircle2 className="size-3" /> Ready
                   </span>
                 </div>
-
-                <h3 className="text-xl font-bold text-foreground mb-2">{channel.name}</h3>
-                <p className="text-xs text-muted-foreground leading-relaxed font-medium mb-6">
-                  {channel.tagline}
-                </p>
-
-                <div className="space-y-2 mb-6 pt-4 border-t border-border/20">
-                  {channel.features.map((f, i) => (
-                    <div key={i} className="flex items-start gap-2 text-xs text-foreground/80 font-medium">
-                      <Check className="size-3.5 text-primary shrink-0 mt-0.5" />
-                      <span>{f}</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              <div className="pt-4 border-t border-border/20 flex items-center justify-between text-xs text-muted-foreground font-medium">
-                <span className="flex items-center gap-1.5">
-                  <ImageIcon className="size-3.5 text-primary" />
-                  {channel.mediaSupport}
-                </span>
-                <span className="flex items-center gap-1 text-emerald-500 font-bold">
-                  <Zap className="size-3.5" /> Ready
-                </span>
-              </div>
-            </motion.div>
+              </CardContent>
+            </Card>
           );
         })}
       </div>
 
       {/* ── Security Callout ──────────────────────────────── */}
-      <motion.div
-        initial={{ opacity: 0, scale: 0.95 }}
-        whileInView={{ opacity: 1, scale: 1 }}
-        viewport={{ once: true }}
-        className="mt-20 rounded-[2.5rem] glass-card p-10 border border-white/10 flex flex-col md:flex-row items-center justify-between gap-8 bg-gradient-to-r from-primary/5 via-purple-500/5 to-transparent"
-      >
-        <div className="flex items-center gap-6">
-          <div className="size-16 rounded-2xl bg-primary/10 border border-primary/20 flex items-center justify-center shrink-0">
-            <Shield className="size-8 text-primary" />
+      <div className="rounded-2xl border border-border/80 bg-card p-6 md:p-8 flex flex-col md:flex-row items-center justify-between gap-6 shadow-2xs">
+        <div className="flex items-center gap-4">
+          <div className="size-12 rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-center shrink-0 text-primary">
+            <Shield className="size-6" />
           </div>
           <div>
-            <h3 className="text-xl font-bold text-foreground">Bank-Grade Encryption</h3>
-            <p className="text-sm text-muted-foreground font-medium max-w-xl">
-              All social access tokens and refresh secrets are encrypted at rest using AES-256 and never shared with any third party.
+            <h3 className="text-base font-bold text-foreground">Bank-Grade OAuth 2.0 Security</h3>
+            <p className="text-xs text-muted-foreground max-w-xl mt-0.5">
+              All social access tokens and credentials are encrypted at rest with AES-256 via InsForge PostgreSQL. We never store personal account passwords.
             </p>
           </div>
         </div>
-        <Button asChild size="lg" className="rounded-full px-8 font-bold shrink-0 shadow-lg shadow-primary/20">
-          <Link href="/settings">
-            Connect Channels
-            <ArrowRight className="ml-2 size-5" />
+        <Button asChild size="default" className="h-10 px-6 font-semibold bg-primary text-primary-foreground hover:bg-primary/90 rounded-lg shadow-xs shrink-0">
+          <Link href="/settings?tab=channels">
+            Manage Channels
+            <ArrowRight className="ml-1.5 size-4" />
           </Link>
         </Button>
-      </motion.div>
+      </div>
     </div>
   );
 }

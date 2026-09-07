@@ -94,22 +94,23 @@ export function GenerateIdeasPopover({ onGenerated }: GenerateIdeasPopoverProps)
   return (
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
-        <Button variant="outline" className="gap-2
-        bg-linear-to-r from-[#b0ec9c33] to-[#d1bdff33]">
-          <Sparkles className="h-4 w-4" />
-          Generate Ideas
+        <Button 
+          variant="outline" 
+          className="gap-2 border-primary/30 bg-primary/10 text-primary hover:bg-primary/20 hover:text-primary font-semibold shadow-2xs transition-colors"
+        >
+          <Sparkles className="h-4 w-4 text-primary" />
+          <span>Generate Ideas</span>
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-[400px] p-4 shadow-lg" align="end">
+      <PopoverContent className="w-[420px] p-5 shadow-xl surface-card border-border" align="end">
       {!canUseAI && !isLoading && (
-         <div className="mb-4 rounded-xl border border-amber-300 bg-amber-50 px-4 py-3
-           text-amber-900 dark:border-amber-900/50 dark:bg-amber-950/40 dark:text-amber-200">
-            <p className="text-sm font-medium">AI idea generation requires an upgrade</p>
-            <p className="mt-1 text-sm text-amber-800/80 dark:text-amber-200/80">
-              <Link href="/billing" className="underline underline-offset-4">
-                Upgrade
+         <div className="mb-4 rounded-xl border border-amber-300 dark:border-amber-900/50 bg-amber-50 dark:bg-amber-950/40 p-3.5 text-amber-900 dark:text-amber-200">
+            <p className="text-xs font-semibold">AI idea generation requires Pro</p>
+            <p className="mt-1 text-xs text-amber-800/80 dark:text-amber-200/80">
+              <Link href="/billing" className="underline font-semibold underline-offset-4">
+                Upgrade your workspace
               </Link>{" "}
-              to Pro or Premium to generate ideas with AI.
+              to unlock unlimited AI ideation.
             </p>
           </div>
       )}

@@ -4,6 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { useQuery } from "@tanstack/react-query";
 import { format, isToday, isTomorrow, parseISO } from "date-fns";
+import { useUser } from "@clerk/nextjs";
 import { 
   Calendar, 
   CheckCircle2, 
@@ -14,9 +15,12 @@ import {
   ArrowUpRight, 
   Radio, 
   Sparkles, 
-  Image as ImageIcon,
-  ExternalLink,
-  RefreshCw
+  Image as ImageIcon, 
+  ExternalLink, 
+  RefreshCw,
+  Wand2,
+  Hash,
+  PenTool,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -30,7 +34,13 @@ import { PostType } from "@/types/post.type";
 import { HugeiconsIcon } from "@hugeicons/react";
 
 export default function DashboardOverviewPage() {
+  const { user } = useUser();
   const [isCreateOpen, setIsCreateOpen] = useState(false);
+
+  // Time-based personalized greeting
+  const hour = new Date().getHours();
+  const greeting = hour < 12 ? "Good morning" : hour < 18 ? "Good afternoon" : "Good evening";
+  const userName = user?.firstName || user?.fullName?.split(" ")[0] || "there";
 
   // 1. Fetch Post Totals (KPIs)
   const { data: totalsData, isLoading: totalsLoading } = useQuery({
@@ -93,25 +103,29 @@ export default function DashboardOverviewPage() {
     }
   };
 
+  const allPostsTotal = (totals.totalQueue || 0) + (totals.totalPublished || 0) + (totals.totalFailed || 0) + (totals.totalDrafts || 0);
+
   return (
     <div className="flex-1 flex flex-col min-w-0 p-4 md:p-6 lg:p-8 space-y-6">
-      {/* Top Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2 border-b border-border/60">
+      {/* Top Greeting & Summary */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-border/60">
         <div>
           <div className="flex items-center gap-2">
             <h1 className="text-2xl font-bold tracking-tight text-foreground">
-              Dashboard Overview
+              {greeting}, {userName}
             </h1>
             <Badge variant="outline" className="text-xs font-semibold border-border bg-muted/40 text-muted-foreground">
               Live
             </Badge>
           </div>
-          <p className="text-sm text-muted-foreground mt-0.5">
-            Operational publishing overview and queue monitor across your connected networks.
+          <p className="text-sm text-muted-foreground mt-1">
+            {queuedPosts.length > 0
+              ? `You have ${queuedPosts.length} post${queuedPosts.length > 1 ? "s" : ""} scheduled across ${connectedChannels.length} connected channel${connectedChannels.length > 1 ? "s" : ""}. Next post publishes ${formatPostTime(queuedPosts[0]?.scheduled_at)}.`
+              : `Your scheduled publishing queue is clear across ${connectedChannels.length} connected channel${connectedChannels.length > 1 ? "s" : ""}. Create a draft to stay ahead.`}
           </p>
         </div>
 
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-3 shrink-0">
           <Button 
             variant="outline" 
             size="sm"
@@ -133,13 +147,57 @@ export default function DashboardOverviewPage() {
         </div>
       </div>
 
-      {/* 4 Operational KPI Status Cards */}
+      {/* High-priority Attention Banner if any posts failed */}
+      {totals.totalFailed > 0 && (
+        <div className="p-3.5 px-4 rounded-xl border border-red-300 dark:border-red-900 bg-red-50/70 dark:bg-red-950/30 flex items-center justify-between gap-3 text-xs">
+          <div className="flex items-center gap-2.5 text-red-700 dark:text-red-300 font-medium">
+            <AlertTriangle className="size-4 shrink-0 text-red-600 dark:text-red-400" />
+            <span>
+              <strong>{totals.totalFailed} post{totals.totalFailed > 1 ? "s" : ""} failed to publish.</strong> Check platform authorization or connection tokens.
+            </span>
+          </div>
+          <Button asChild size="sm" variant="destructive" className="h-7 px-2.5 text-xs shadow-xs">
+            <Link href="/content?status=failed">Review & Retry</Link>
+          </Button>
+        </div>
+      )}
+
+      {/* 4 Professional KPI Metric Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        {/* 1. Queue Card */}
+        {/* 1. Total Posts Card */}
         <Card className="surface-card">
           <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
             <CardTitle className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-              Scheduled Queue
+              Total Posts
+            </CardTitle>
+            <div className="size-8 rounded-lg bg-indigo-50 dark:bg-indigo-950/50 flex items-center justify-center text-indigo-600 dark:text-indigo-400">
+              <Calendar className="size-4" />
+            </div>
+          </CardHeader>
+          <CardContent>
+            {totalsLoading ? (
+              <Skeleton className="h-8 w-20" />
+            ) : (
+              <>
+                <div className="text-2xl font-bold text-foreground">
+                  {allPostsTotal}
+                </div>
+                <p className="text-xs text-muted-foreground mt-1 flex items-center gap-1">
+                  <span>Across all states</span>
+                  <Link href="/content" className="text-primary hover:underline ml-auto font-medium">
+                    All &rarr;
+                  </Link>
+                </p>
+              </>
+            )}
+          </CardContent>
+        </Card>
+
+        {/* 2. Scheduled Queue Card */}
+        <Card className="surface-card">
+          <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
+            <CardTitle className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+              Scheduled
             </CardTitle>
             <div className="size-8 rounded-lg bg-sky-50 dark:bg-sky-950/50 flex items-center justify-center text-sky-600 dark:text-sky-400">
               <Clock className="size-4" />
@@ -154,7 +212,7 @@ export default function DashboardOverviewPage() {
                   {totals.totalQueue}
                 </div>
                 <p className="text-xs text-muted-foreground mt-1 flex items-center gap-1">
-                  <span>In publishing queue</span>
+                  <span>Queued for delivery</span>
                   <Link href="/schedule" className="text-primary hover:underline ml-auto font-medium">
                     View &rarr;
                   </Link>
@@ -164,11 +222,11 @@ export default function DashboardOverviewPage() {
           </CardContent>
         </Card>
 
-        {/* 2. Published Card */}
+        {/* 3. Published Card */}
         <Card className="surface-card">
           <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
             <CardTitle className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-              Published Posts
+              Published
             </CardTitle>
             <div className="size-8 rounded-lg bg-emerald-50 dark:bg-emerald-950/50 flex items-center justify-center text-emerald-600 dark:text-emerald-400">
               <CheckCircle2 className="size-4" />
@@ -193,43 +251,11 @@ export default function DashboardOverviewPage() {
           </CardContent>
         </Card>
 
-        {/* 3. Attention Needed / Failed Card */}
-        <Card className={`surface-card ${totals.totalFailed > 0 ? "border-red-300 dark:border-red-900 bg-red-50/20 dark:bg-red-950/10" : ""}`}>
-          <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
-            <CardTitle className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-              Attention Needed
-            </CardTitle>
-            <div className={`size-8 rounded-lg flex items-center justify-center ${totals.totalFailed > 0 ? "bg-red-100 dark:bg-red-950/80 text-red-600 dark:text-red-400" : "bg-muted text-muted-foreground"}`}>
-              <AlertTriangle className="size-4" />
-            </div>
-          </CardHeader>
-          <CardContent>
-            {totalsLoading ? (
-              <Skeleton className="h-8 w-20" />
-            ) : (
-              <>
-                <div className={`text-2xl font-bold ${totals.totalFailed > 0 ? "text-red-600 dark:text-red-400" : "text-foreground"}`}>
-                  {totals.totalFailed}
-                </div>
-                <p className="text-xs text-muted-foreground mt-1 flex items-center gap-1">
-                  {totals.totalFailed > 0 ? (
-                    <Link href="/content?status=failed" className="text-red-600 dark:text-red-400 font-semibold hover:underline">
-                      Review & retry failed posts &rarr;
-                    </Link>
-                  ) : (
-                    <span>All systems healthy</span>
-                  )}
-                </p>
-              </>
-            )}
-          </CardContent>
-        </Card>
-
         {/* 4. Drafts Card */}
         <Card className="surface-card">
           <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
             <CardTitle className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-              Saved Drafts
+              Drafts
             </CardTitle>
             <div className="size-8 rounded-lg bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-600 dark:text-slate-400">
               <FileText className="size-4" />
@@ -244,7 +270,7 @@ export default function DashboardOverviewPage() {
                   {totals.totalDrafts}
                 </div>
                 <p className="text-xs text-muted-foreground mt-1 flex items-center gap-1">
-                  <span>In-progress posts</span>
+                  <span>Unpublished drafts</span>
                   <Link href="/content?status=draft" className="text-primary hover:underline ml-auto font-medium">
                     Open &rarr;
                   </Link>
@@ -254,6 +280,69 @@ export default function DashboardOverviewPage() {
           </CardContent>
         </Card>
       </div>
+
+      {/* AI Assistant Studio Section */}
+      <Card className="surface-card border-border/80 bg-gradient-to-r from-primary/5 via-card to-accent/5">
+        <CardContent className="p-4 sm:p-5">
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div className="flex items-center gap-3">
+              <div className="size-9 rounded-lg bg-primary/10 text-primary flex items-center justify-center shrink-0">
+                <Sparkles className="size-4.5" />
+              </div>
+              <div>
+                <h3 className="text-sm font-semibold text-foreground flex items-center gap-2">
+                  <span>AI Content Assistant</span>
+                  <Badge variant="secondary" className="text-[10px] bg-primary/10 text-primary border-primary/20">Fast Studio</Badge>
+                </h3>
+                <p className="text-xs text-muted-foreground mt-0.5">
+                  Accelerate writing, brainstorm viral angles, and adapt copy per channel.
+                </p>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-2 flex-wrap">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setIsCreateOpen(true)}
+                className="text-xs gap-1.5 bg-background/80 hover:bg-background"
+              >
+                <Wand2 className="size-3.5 text-primary" />
+                <span>Generate Post</span>
+              </Button>
+              <Button
+                asChild
+                variant="outline"
+                size="sm"
+                className="text-xs gap-1.5 bg-background/80 hover:bg-background"
+              >
+                <Link href="/ideas">
+                  <Sparkles className="size-3.5 text-amber-500" />
+                  <span>Generate Ideas</span>
+                </Link>
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setIsCreateOpen(true)}
+                className="text-xs gap-1.5 bg-background/80 hover:bg-background hidden sm:flex"
+              >
+                <PenTool className="size-3.5 text-emerald-500" />
+                <span>Improve Caption</span>
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setIsCreateOpen(true)}
+                className="text-xs gap-1.5 bg-background/80 hover:bg-background hidden lg:flex"
+              >
+                <Hash className="size-3.5 text-sky-500" />
+                <span>Suggest Hashtags</span>
+              </Button>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
 
       {/* Main Two-Column Operations Layout */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">

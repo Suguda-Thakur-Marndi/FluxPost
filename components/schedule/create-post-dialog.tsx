@@ -15,7 +15,6 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "../ui/tooltip";
 import { toast } from "sonner";
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { toggleVariants } from "../ui/toggle";
-import ChannelAvatar from "../channel-avatar";
 import ContentTextarea from "../content-textarea";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "../ui/accordion";
 import { HugeiconsIcon } from "@hugeicons/react";
@@ -257,7 +256,7 @@ const CreatePostDialog = ({ open, onOpenChange, selectedDate }: PropsType) => {
         })
     }
 
-    const handleCreatePost = (status?: PostStatus) => {
+    const handleCreatePost = (status?: PostStatus, publishNow: boolean = false) => {
         if (selectedChannels.length === 0) {
             toast.error("Select at least one channel")
             return;
@@ -275,13 +274,18 @@ const CreatePostDialog = ({ open, onOpenChange, selectedDate }: PropsType) => {
             return
         }
 
-        const parsedTime = parse(timeSlot, "h:mm a", new Date());
-        const scheduleAt = set(date || new Date(), {
-            hours: parsedTime.getHours(),
-            minutes: parsedTime.getMinutes(),
-            seconds: 0,
-            milliseconds: 0
-        })
+        let scheduleAt: Date;
+        if (publishNow || status === POST_STATUS.DRAFT) {
+            scheduleAt = new Date();
+        } else {
+            const parsedTime = parse(timeSlot, "h:mm a", new Date());
+            scheduleAt = set(date || new Date(), {
+                hours: parsedTime.getHours(),
+                minutes: parsedTime.getMinutes(),
+                seconds: 0,
+                milliseconds: 0
+            })
+        }
 
         createPostMutation.mutate({
             posts: postToCreate,
@@ -341,50 +345,60 @@ const CreatePostDialog = ({ open, onOpenChange, selectedDate }: PropsType) => {
                                         {selectedChannels.length === connectedChannels.length ? "Unselect all" : "Select all"}
                                     </button>
                                 )}
-                                <div className="flex flex-wrap gap-4">
+                                <div className="flex flex-wrap gap-2.5">
                                     {isPending ? (
-                                        Array.from({ length: 6 }).map((_, index) => (
-                                            <Skeleton key={index} className="size-[50px] rounded-xl" />
+                                        Array.from({ length: 4 }).map((_, index) => (
+                                            <Skeleton key={index} className="h-9 w-28 rounded-xl" />
                                         ))
                                     ) : (
                                         channels?.map((channel) => {
                                             const selected = selectedChannels.includes(channel.id)
                                             const isConnected = channel.connected
+                                            const Icon = getChannelIcon(channel.type)
                                             return (
-                                                // eslint-disable-next-line react/jsx-key
-                                                <Tooltip>
+                                                <Tooltip key={channel.id}>
                                                     <TooltipTrigger asChild>
                                                         <button
-                                                            key={channel.id}
+                                                            type="button"
                                                             style={{ "--channel-color": channel.color } as React.CSSProperties}
                                                             className={cn(
-                                                                "relative shrink-0 rounded-xl p-0 transition-all",
-                                                                !isConnected ? "cursor-not-allowed" : "cursor-pointer",
-                                                                selected ? "ring-2 ring-(--channel-color) ring-offset-1" : "grayscale!"
+                                                                "relative flex items-center gap-2 px-3 py-1.5 rounded-xl border text-xs font-semibold transition-all select-none",
+                                                                !isConnected 
+                                                                    ? "border-dashed border-border/80 text-muted-foreground/60 bg-muted/20 opacity-60 cursor-not-allowed" 
+                                                                    : selected 
+                                                                        ? "border-primary bg-primary/10 text-foreground ring-2 ring-primary/20 shadow-xs cursor-pointer" 
+                                                                        : "border-border bg-card text-muted-foreground hover:text-foreground hover:border-slate-300 dark:hover:border-slate-700 cursor-pointer"
                                                             )}
                                                             onClick={() => {
                                                                 if (!isConnected) {
-                                                                    toast.error("Please connect the channel first");
+                                                                    toast.error(`Please connect ${channel.name} in Settings first`);
                                                                     return;
                                                                 }
-
-                                                                toggleChannel(
-                                                                    channel.id,
-                                                                    channel.character_limit
-                                                                )
-                                                            }}>
-
-                                                            <ChannelAvatar
-                                                                className=""
-                                                                type={channel.type}
-                                                                color={channel.color}
-                                                                profileImage={channel.profile_image}
-                                                            />
+                                                                toggleChannel(channel.id, channel.character_limit);
+                                                            }}
+                                                        >
+                                                            <div 
+                                                                className="size-5 rounded-md flex items-center justify-center text-white shrink-0"
+                                                                style={{ backgroundColor: isConnected ? channel.color : "#94A3B8" }}
+                                                            >
+                                                                {Icon ? (
+                                                                    <HugeiconsIcon icon={Icon} className="size-3.5" color="currentColor" />
+                                                                ) : (
+                                                                    <span className="text-[10px] font-bold">{channel.name[0]}</span>
+                                                                )}
+                                                            </div>
+                                                            <span className="truncate max-w-[90px]">{channel.handle || channel.name}</span>
+                                                            {selected && (
+                                                                <span className="size-1.5 rounded-full bg-primary shrink-0" />
+                                                            )}
                                                         </button>
                                                     </TooltipTrigger>
                                                     <TooltipContent>
-                                                        Preview {channel.name}
-                                                        {!isConnected && <span className="text-primary"> → Connect Channel</span>}
+                                                        {isConnected ? (
+                                                            <span>{selected ? "Click to deselect" : `Select ${channel.name}`}</span>
+                                                        ) : (
+                                                            <span>{channel.name} (Not connected) — Connect in Settings</span>
+                                                        )}
                                                     </TooltipContent>
                                                 </Tooltip>
                                             )
@@ -589,48 +603,60 @@ dark:text-amber-400">
                     </div>
                 </div>
 
-                <DialogFooter className="px-8 pt-5 pb-4 m-0!">
+                <DialogFooter className="px-8 py-3.5 border-t border-border bg-card/60 flex flex-row items-center justify-between gap-3 m-0!">
                     {hasConnectedChannel ? (
-                        <div className="w-full flex items-center justify-between
-                        gap-2
-                        ">
+                        <div className="w-full flex items-center justify-between gap-3">
                             <Button
-                                size="lg"
+                                size="sm"
                                 variant="ghost"
+                                className="text-muted-foreground hover:text-foreground font-medium text-xs h-9 px-3"
                                 disabled={createPostMutation.isPending}
                                 onClick={() => handleCreatePost(POST_STATUS.DRAFT)}
                             >
-                                {createPostMutation.isPending && createPostMutation.variables.status === POST_STATUS.DRAFT && <Spinner />}
+                                {createPostMutation.isPending && createPostMutation.variables?.status === POST_STATUS.DRAFT && <Spinner className="mr-1.5 size-3.5" />}
                                 Save Draft
                             </Button>
-                            <ButtonGroup className="p-0!">
-                                <ScheduleDatePicker
-                                    date={date}
-                                    setDate={setDate}
-                                    time={timeSlot}
-                                    setTime={setTimeSlot}
-                                    renderButton={(isDatePassed, isTimeNotAvailable) => <Button
-                                        size="lg"
-                                        className="border py-4.5 px-4"
-                                        disabled={createPostMutation.isPending || !date || !timeSlot || isDatePassed || isTimeNotAvailable}
-                                        onClick={() => {
-                                            if (isDatePassed || isTimeNotAvailable) {
-                                                toast.error("Please select a valid date and time")
-                                                return;
-                                            }
-                                            handleCreatePost()
-                                        }}
-                                    >
-                                        {createPostMutation.isPending && createPostMutation.variables.status === undefined && <Spinner />}
-                                        Schedule Post
-                                    </Button>}
-
-                                />
-                            </ButtonGroup>
+                            <div className="flex items-center gap-2">
+                                <Button
+                                    size="sm"
+                                    variant="outline"
+                                    className="font-medium text-xs h-9 px-3.5 border-border hover:border-primary/40 hover:bg-primary/5 hover:text-primary transition-all cursor-pointer"
+                                    disabled={createPostMutation.isPending || selectedChannels.length === 0}
+                                    onClick={() => handleCreatePost(undefined, true)}
+                                >
+                                    {createPostMutation.isPending && createPostMutation.variables?.status === undefined && !timeSlot && <Spinner className="mr-1.5 size-3.5" />}
+                                    Publish Now
+                                </Button>
+                                <ButtonGroup className="p-0!">
+                                    <ScheduleDatePicker
+                                        date={date}
+                                        setDate={setDate}
+                                        time={timeSlot}
+                                        setTime={setTimeSlot}
+                                        renderButton={(isDatePassed, isTimeNotAvailable) => (
+                                            <Button
+                                                size="sm"
+                                                className="shadow-xs font-semibold text-xs h-9 px-4 bg-primary text-primary-foreground hover:bg-primary/90 transition-all cursor-pointer"
+                                                disabled={createPostMutation.isPending || !date || !timeSlot || isDatePassed || isTimeNotAvailable}
+                                                onClick={() => {
+                                                    if (isDatePassed || isTimeNotAvailable) {
+                                                        toast.error("Please select a valid date and time")
+                                                        return;
+                                                    }
+                                                    handleCreatePost()
+                                                }}
+                                            >
+                                                {createPostMutation.isPending && createPostMutation.variables?.status === undefined && timeSlot && <Spinner className="mr-1.5 size-3.5" />}
+                                                Schedule Post
+                                            </Button>
+                                        )}
+                                    />
+                                </ButtonGroup>
+                            </div>
                         </div>
                     ) : (
-                        <Button size="lg" asChild>
-                            <Link href="/settings"> Connect Channel to Post</Link>
+                        <Button size="sm" className="h-9 px-4 text-xs font-semibold" asChild>
+                            <Link href="/settings?tab=channels">Connect Channel to Post</Link>
                         </Button>
                     )}
                 </DialogFooter>

@@ -29,14 +29,16 @@ import ChannelAvatar from '@/components/channel-avatar';
 import { toast } from 'sonner';
 import { useState } from 'react';
 import CreatePostDialog from '@/components/schedule/create-post-dialog';
+import { Share2 } from 'lucide-react';
 
 const mainNav = [
-  { name: "Overview", href: "/dashboard", icon: LayoutDashboard },
-  { name: "Content", href: "/content", icon: Layers },
-  { name: "Calendar", href: "/schedule", icon: Calendar },
-  { name: "Media Library", href: "/media", icon: ImageIcon },
+  { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
   { name: "Ideas", href: "/ideas", icon: Lightbulb },
+  { name: "Schedule", href: "/schedule", icon: Calendar },
+  { name: "Channels", href: "/settings?tab=channels", icon: Share2 },
+  { name: "Content", href: "/content", icon: Layers },
   { name: "Analytics", href: "/analytics", icon: BarChart3 },
+  { name: "Media Library", href: "/media", icon: ImageIcon },
 ];
 
 const secondaryNav = [
@@ -277,9 +279,17 @@ const AppSidebar = () => {
 
       <SidebarFooter className="border-t border-sidebar-border/60 p-3 bg-sidebar">
         {!isCollapsed && (
-          <div className="mb-2 px-1 text-[11px] font-semibold text-muted-foreground uppercase tracking-wider flex items-center justify-between">
-            <span>Channels Sync</span>
-            <span className="text-foreground">{connectedCount}/{totalChannels}</span>
+          <div className="mb-2.5 px-1 space-y-1.5">
+            <div className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider flex items-center justify-between">
+              <span>Channels Connected</span>
+              <span className="text-foreground font-bold">{connectedCount}/{totalChannels}</span>
+            </div>
+            <div className="h-1.5 w-full bg-muted rounded-full overflow-hidden">
+              <div 
+                className="h-full bg-primary rounded-full transition-all duration-300"
+                style={{ width: `${totalChannels > 0 ? Math.min(100, Math.round((connectedCount / totalChannels) * 100)) : 0}%` }}
+              />
+            </div>
           </div>
         )}
         <div className="flex items-center gap-2.5 px-1 py-1">

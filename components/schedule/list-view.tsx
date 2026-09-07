@@ -7,7 +7,7 @@ import { Tabs, TabsList, TabsTrigger } from "../ui/tabs";
 import { Badge } from "../ui/badge";
 import ScheduleToolbar from "./schedule-toolbar";
 import { Skeleton } from "../ui/skeleton";
-import { AlarmClockCheck, ExternalLink, LayoutList, Pin, Plus, Send } from "lucide-react";
+import { AlarmClockCheck, ExternalLink, LayoutList, Plus, Send } from "lucide-react";
 import { Button } from "../ui/button";
 import { format, formatDistanceToNow, isPast, parseISO } from "date-fns";
 import { Card, CardContent, CardFooter } from "../ui/card";
@@ -199,50 +199,61 @@ const ListView = ({ setCreatePostModalOpen }: {
                         const channel = post.user_channels?.channel_types;
                         const previewImage = post.images?.[0]?.url;
                         return (
-                          <div key={post.id} className="grid gap-2
-                        lg:grid-cols-[120px_minmax(0,1fr)]">
-                            <div>
-                              <h5>
+                          <div key={post.id} className="grid gap-4 lg:grid-cols-[140px_minmax(0,1fr)] items-start">
+                            <div className="pt-2">
+                              <h5 className="text-sm font-semibold text-foreground tabular-nums">
                                 {format(scheduleDate, "h:mm a")}
                               </h5>
-                              { }
                               <div className={cn(
-                                "flex items-center gap-2",
+                                "flex items-center gap-1.5 mt-1 text-xs font-medium",
                                 isPast(scheduleDate) && (post.status === "queue" || post.status === "draft")
                                   ? "text-destructive"
                                   : "text-muted-foreground"
                               )}>
-                                <Pin className="size-4" />
+                                <span className={cn(
+                                  "size-2 rounded-full",
+                                  post.status === "published" 
+                                    ? "bg-emerald-500" 
+                                    : post.status === "failed" 
+                                      ? "bg-destructive" 
+                                      : isPast(scheduleDate) 
+                                        ? "bg-destructive animate-pulse" 
+                                        : "bg-primary/70"
+                                )} />
                                 <span className="capitalize">
                                   {isPast(scheduleDate) && (post.status === "queue" || post.status === "draft")
                                     ? "Overdue"
                                     : post.status === "draft"
                                       ? "Draft"
-                                      : "Custom"}
+                                      : post.status === "published"
+                                        ? "Published"
+                                        : post.status === "failed"
+                                          ? "Failed"
+                                          : "Scheduled"}
                                 </span>
                               </div>
                             </div>
 
-                            <Card className="py-0 gap-0">
-                              <CardContent className="grid gap-6 p-5
-                            md:grid-cols-[minmax(0,1fr)_250px]">
-                                <div className="space-y-5">
+                            <Card className="rounded-xl border border-border/80 bg-card shadow-2xs hover:border-slate-300 dark:hover:border-slate-700 transition-all overflow-hidden">
+                              <CardContent className="grid gap-5 p-5 md:grid-cols-[minmax(0,1fr)_220px]">
+                                <div className="space-y-3.5 min-w-0">
                                   {channel ? (
-                                    <ChannelAvatar
-                                      type={channel.type}
-                                      color={channel.color}
-                                      profileImage={post.user_channels?.profile_image}
-                                      name={post.user_channels?.handle || channel.name}
-                                    />
+                                    <div className="flex items-center gap-2">
+                                      <ChannelAvatar
+                                        type={channel.type}
+                                        color={channel.color}
+                                        profileImage={post.user_channels?.profile_image}
+                                        name={post.user_channels?.handle || channel.name}
+                                      />
+                                    </div>
                                   ) : null}
 
-                                  <p className="whitespace-pre-wrap text-sm leading-6
-                                line-clamp-4
-                                ">{post.content}</p>
+                                  <p className="whitespace-pre-wrap text-sm leading-relaxed text-foreground/90 line-clamp-4 font-normal">
+                                    {post.content}
+                                  </p>
                                 </div>
 
-                                <div className="max-h-[165px] overflow-hidden rounded-2xl
-                  border bg-muted/40">
+                                <div className="h-[140px] overflow-hidden rounded-xl border border-border/60 bg-muted/30">
                                   {previewImage ? (
                                     // eslint-disable-next-line @next/next/no-img-element
                                     <img
@@ -251,60 +262,64 @@ const ListView = ({ setCreatePostModalOpen }: {
                                       className="h-full w-full object-cover"
                                     />
                                   ) : (
-                                    <div className="flex h-full-center justify-center text-sm text-muted-foreground">
-                                      No media
+                                    <div className="flex h-full items-center justify-center text-xs text-muted-foreground/70">
+                                      No media attached
                                     </div>
                                   )}
                                 </div>
                               </CardContent>
 
-                              <CardFooter className="flex flex-col gap-4 border-t px-6 py-3
-                          md:flex-row md:items-center md:justify-between
-                          ">
-                                <p className="text-sm text-muted-foreground">
+                              <CardFooter className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 border-t border-border/60 px-5 py-3 bg-muted/15 text-xs">
+                                <p className="text-muted-foreground">
                                   {post.status === "published" ? (
                                     <>
-                                      Published via <span className="font-medium text-foreground">{channel?.name || "Channel"}</span>
+                                      Published via <span className="font-semibold text-foreground">{channel?.name || "Channel"}</span>
                                     </>
                                   ) : (
                                     <>
-                                      You created this <span className="font-medium text-foreground">
+                                      Created <span className="font-medium text-foreground">
                                         {formatDistanceToNow(parseISO(post.created_at))}
                                       </span> ago
                                     </>
                                   )}
                                 </p>
 
-                                <div className="flex items-center gap-3">
+                                <div className="flex items-center gap-2 self-end sm:self-auto">
                                   {post.published_url && post.status === "published" ? (
-                                    <Button asChild variant="outline">
+                                    <Button asChild variant="outline" size="sm" className="h-8 text-xs font-semibold gap-1.5 rounded-lg border-border">
                                       <a
                                         href={post.published_url}
                                         target="_blank"
                                         rel="noopener noreferrer"
                                       >
-                                        <ExternalLink className="h-4 w-4" />
+                                        <ExternalLink className="h-3.5 w-3.5" />
                                         View Post
                                       </a>
                                     </Button>
                                   ) : (
                                     <>
-                                      <Button variant="outline"
+                                      <Button 
+                                        variant="outline" 
+                                        size="sm"
+                                        className="h-8 text-xs font-semibold gap-1.5 rounded-lg border-border hover:bg-muted"
                                         onClick={() => handleEditPost(post)}
                                       >
-                                        <AlarmClockCheck className="size-4" />
-                                        Reschedule
+                                        <AlarmClockCheck className="size-3.5" />
+                                        Edit / Reschedule
                                       </Button>
 
                                       {post.status === "draft" && (
-                                        <Button variant="outline"
+                                        <Button 
+                                          variant="default"
+                                          size="sm"
+                                          className="h-8 text-xs font-semibold gap-1.5 rounded-lg bg-primary text-primary-foreground hover:bg-primary/90"
                                           disabled={publishPostMutation.isPending}
                                           onClick={() => handlePublishNow(post)}
                                         >
                                           {publishPostMutation.isPending ? (
-                                            <Spinner />
+                                            <Spinner className="size-3.5" />
                                           ) : (
-                                            <Send className="size-4" />
+                                            <Send className="size-3.5" />
                                           )}
                                           Publish Now
                                         </Button>
@@ -314,7 +329,6 @@ const ListView = ({ setCreatePostModalOpen }: {
                                 </div>
                               </CardFooter>
                             </Card>
-
                           </div>
                         )
                       })}

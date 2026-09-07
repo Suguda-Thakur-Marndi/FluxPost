@@ -1,5 +1,6 @@
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 import AppSidebar from "@/app/routes/dashboard/_common/app-sidebar";
+import DashboardHeader from "@/components/dashboard-header";
 
 export default function DashboardLayout({
   children,
@@ -11,6 +12,7 @@ export default function DashboardLayout({
       <div className="flex min-h-screen w-full bg-background text-foreground">
         <AppSidebar />
         <SidebarInset className="flex-1 flex flex-col min-w-0 bg-background border-l border-border/70 overflow-hidden h-screen">
+          <DashboardHeader />
           <main className="flex-1 flex flex-col overflow-y-auto overflow-x-hidden">
             {children}
           </main>

@@ -1,15 +1,10 @@
-"use client";
-
-import { motion } from "framer-motion";
 import { Shield } from "lucide-react";
 
 export default function PrivacyPage() {
   return (
     <div className="py-20 px-6 max-w-4xl mx-auto">
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="glass-card rounded-[2.5rem] p-10 sm:p-14 border border-white/10 shadow-2xl space-y-8 backdrop-blur-2xl"
+      <div
+        className="surface-card rounded-2xl p-8 sm:p-12 border border-border/80 shadow-2xs space-y-8"
       >
         <div className="flex items-center gap-4 pb-6 border-b border-border/30">
           <div className="size-12 rounded-2xl bg-primary/10 flex items-center justify-center text-primary border border-primary/20">
@@ -77,7 +72,7 @@ export default function PrivacyPage() {
             </p>
           </section>
         </div>
-      </motion.div>
+      </div>
     </div>
   );
 }
