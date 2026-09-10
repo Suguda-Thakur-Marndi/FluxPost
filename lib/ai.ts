@@ -3,6 +3,26 @@ import { getInsforgeServerClient } from "@/lib/insforge-server";
 export const POST_ACTIONS = ["generate", "rephrase", "shorten", "expand"] as const;
 export type ActionType = (typeof POST_ACTIONS)[number];
 
+// Input length limits to prevent prompt injection and runaway API costs
+export const AI_LIMITS = {
+  MAX_PROMPT_CHARS: 2_000,
+  MAX_CONTENT_CHARS: 5_000,
+  MAX_BUSINESS_TYPE_CHARS: 200,
+  MAX_TARGET_AUDIENCE_CHARS: 200,
+} as const;
+
+/**
+ * Validate and truncate AI input strings to prevent oversized payloads.
+ * Throws an error if inputs exceed allowed limits.
+ */
+export function validateAiInputs(inputs: Record<string, { value: string; limit: number; label: string }>) {
+  for (const [, { value, limit, label }] of Object.entries(inputs)) {
+    if (typeof value === "string" && value.length > limit) {
+      throw new Error(`${label} exceeds the maximum length of ${limit} characters.`);
+    }
+  }
+}
+
 interface GeminiGenerateResponse {
   candidates?: Array<{
     content?: {
@@ -146,6 +166,11 @@ export async function generateIdeas({
   businessType: string;
   targetAudience: string;
 }): Promise<GeneratedIdea[]> {
+  validateAiInputs({
+    businessType: { value: businessType, limit: AI_LIMITS.MAX_BUSINESS_TYPE_CHARS, label: "Business type" },
+    targetAudience: { value: targetAudience, limit: AI_LIMITS.MAX_TARGET_AUDIENCE_CHARS, label: "Target audience" },
+  });
+
   const systemPrompt = `You are a social media content ideation assistant.
 Return only valid JSON.
 The response must be an object with an "ideas" array.
@@ -229,6 +254,11 @@ export async function generatePostContent({
   channelType?: string;
   characterLimit?: number;
 }): Promise<string> {
+  validateAiInputs({
+    content: { value: content, limit: AI_LIMITS.MAX_CONTENT_CHARS, label: "Content" },
+    prompt: { value: prompt, limit: AI_LIMITS.MAX_PROMPT_CHARS, label: "Prompt" },
+  });
+
   const systemInstruction = buildPostSystemPrompt(channelType, characterLimit);
   const userPrompt = buildPostPrompt(action, content, prompt);
 

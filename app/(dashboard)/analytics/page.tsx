@@ -92,7 +92,7 @@ export default function AnalyticsPage() {
         <Card className="surface-card">
           <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
             <CardTitle className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-              Total Audience Reach
+              Est. Audience Reach
             </CardTitle>
             <div className="size-8 rounded-lg bg-sky-50 dark:bg-sky-950/50 flex items-center justify-center text-sky-600 dark:text-sky-400">
               <Eye className="size-4" />
@@ -107,10 +107,8 @@ export default function AnalyticsPage() {
                   {estimatedReach.toLocaleString()}
                 </div>
                 <p className="text-xs text-muted-foreground mt-1 flex items-center gap-1">
-                  <span className="text-emerald-600 dark:text-emerald-400 font-semibold flex items-center">
-                    <TrendingUp className="size-3 mr-0.5" /> +14.8%
-                  </span>
-                  <span>vs previous {timeRange}</span>
+                  <span className="text-amber-600 dark:text-amber-400 font-semibold">Estimated</span>
+                  <span>based on published posts</span>
                 </p>
               </>
             )}
@@ -120,7 +118,7 @@ export default function AnalyticsPage() {
         <Card className="surface-card">
           <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
             <CardTitle className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-              Total Engagements
+              Est. Total Engagements
             </CardTitle>
             <div className="size-8 rounded-lg bg-emerald-50 dark:bg-emerald-950/50 flex items-center justify-center text-emerald-600 dark:text-emerald-400">
               <MousePointerClick className="size-4" />
@@ -135,9 +133,7 @@ export default function AnalyticsPage() {
                   {estimatedEngagements.toLocaleString()}
                 </div>
                 <p className="text-xs text-muted-foreground mt-1 flex items-center gap-1">
-                  <span className="text-emerald-600 dark:text-emerald-400 font-semibold flex items-center">
-                    <TrendingUp className="size-3 mr-0.5" /> +9.2%
-                  </span>
+                  <span className="text-amber-600 dark:text-amber-400 font-semibold">Estimated</span>
                   <span>likes, shares, clicks</span>
                 </p>
               </>
@@ -148,7 +144,7 @@ export default function AnalyticsPage() {
         <Card className="surface-card">
           <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
             <CardTitle className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-              Avg Engagement Rate
+              Est. Engagement Rate
             </CardTitle>
             <div className="size-8 rounded-lg bg-purple-50 dark:bg-purple-950/50 flex items-center justify-center text-purple-600 dark:text-purple-400">
               <BarChart3 className="size-4" />
@@ -163,10 +159,8 @@ export default function AnalyticsPage() {
                   {avgEngagementRate}
                 </div>
                 <p className="text-xs text-muted-foreground mt-1 flex items-center gap-1">
-                  <span className="text-emerald-600 dark:text-emerald-400 font-semibold flex items-center">
-                    <TrendingUp className="size-3 mr-0.5" /> +0.6%
-                  </span>
-                  <span>industry benchmark 3.2%</span>
+                  <span className="text-amber-600 dark:text-amber-400 font-semibold">Estimated</span>
+                  <span>industry benchmark ~3.2%</span>
                 </p>
               </>
             )}

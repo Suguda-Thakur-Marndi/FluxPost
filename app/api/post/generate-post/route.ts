@@ -1,4 +1,4 @@
-import { generatePostContent, POST_ACTIONS, type ActionType } from "@/lib/ai";
+import { AI_LIMITS, generatePostContent, POST_ACTIONS, type ActionType } from "@/lib/ai";
 import { getInsforgeServerClient } from "@/lib/insforge-server";
 import { auth } from "@clerk/nextjs/server";
 import { NextRequest, NextResponse } from "next/server";
@@ -32,6 +32,20 @@ export async function POST(request: NextRequest) {
         }
         if (action === "generate" && !prompt.trim()) {
             return NextResponse.json({ error: "Prompt is required for generate action" }, { status: 400 });
+        }
+
+        // Input length validation — prevents prompt injection and excessive API costs
+        if (prompt && prompt.length > AI_LIMITS.MAX_PROMPT_CHARS) {
+            return NextResponse.json(
+                { error: `Prompt must be ${AI_LIMITS.MAX_PROMPT_CHARS} characters or less.` },
+                { status: 400 }
+            );
+        }
+        if (content && content.length > AI_LIMITS.MAX_CONTENT_CHARS) {
+            return NextResponse.json(
+                { error: `Content must be ${AI_LIMITS.MAX_CONTENT_CHARS} characters or less.` },
+                { status: 400 }
+            );
         }
 
         let channelType: string | undefined;
