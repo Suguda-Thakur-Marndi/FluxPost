@@ -1,528 +1,1085 @@
 # Media Scheduler
 
-An enterprise-grade social media management and content scheduling platform built with **Next.js 16 (App Router)**, **React 19**, **TypeScript**, **Tailwind CSS v4**, **shadcn/ui**, **Clerk Authentication**, **InsForge PostgreSQL BaaS**, and **Google Gemini AI**.
+[![Next.js](https://img.shields.io/badge/Next.js-16.2.9-black?style=flat-square&logo=next.js)](https://nextjs.org/)
+[![React](https://img.shields.io/badge/React-19.2.4-blue?style=flat-square&logo=react)](https://react.dev/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.0-blue?style=flat-square&logo=typescript)](https://www.typescriptlang.org/)
+[![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-v4.0-38B2AC?style=flat-square&logo=tailwind-css)](https://tailwindcss.com/)
+[![shadcn/ui](https://img.shields.io/badge/shadcn%2Fui-4.11-black?style=flat-square&logo=shadcnui)](https://ui.shadcn.com/)
+[![Clerk](https://img.shields.io/badge/Clerk-Authentication-6C47FF?style=flat-square&logo=clerk)](https://clerk.com/)
+[![InsForge](https://img.shields.io/badge/InsForge-PostgreSQL%20BaaS-00E599?style=flat-square)](https://insforge.dev)
+[![Inngest](https://img.shields.io/badge/Inngest-Background%20Jobs-000000?style=flat-square&logo=inngest)](https://www.inngest.com/)
+[![Google Gemini](https://img.shields.io/badge/Google_Gemini-2.5_Flash-4285F4?style=flat-square&logo=google)](https://aistudio.google.com/)
+[![Docker](https://img.shields.io/badge/Docker-Ready-2496ED?style=flat-square&logo=docker)](https://www.docker.com/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=flat-square)](LICENSE)
 
-Media Scheduler empowers creators, social media managers, and marketing teams to brainstorm AI-driven ideas, draft and format posts, preview realistic cross-platform feeds across **8 social networks**, schedule automated background publishing via **Inngest cron jobs**, manage a media library, and track publishing analytics from a unified command center.
+An enterprise-grade, multi-channel social media management and content automation platform built with **Next.js 16 (App Router)**, **React 19**, **TypeScript**, **Tailwind CSS v4**, **shadcn/ui**, **Clerk Authentication**, **InsForge PostgreSQL BaaS**, and **Google Gemini AI**.
+
+Media Scheduler empowers creators, marketing teams, and digital agencies to brainstorm AI-driven ideas, draft and format copy, preview realistic platform feeds across **8 social networks**, schedule automated background publishing via **Inngest cron workflows**, curate a media library, and track publishing analytics from a single unified command center.
 
 ---
 
 ## Table of Contents
 
+- [Executive Overview](#executive-overview)
 - [Key Features](#key-features)
-- [Supported Social Channels](#supported-social-channels)
-- [Design System & UI/UX](#design-system--uiux)
-- [Tech Stack](#tech-stack)
-- [Application Architecture & Routes](#application-architecture--routes)
-- [API Endpoints Reference](#api-endpoints-reference)
-- [Database Schema (InsForge PostgreSQL)](#database-schema-insforge-postgresql)
-- [AI Integration](#ai-integration)
-- [Background Publishing Workflow (Inngest)](#background-publishing-workflow-inngest)
-- [Getting Started & Local Setup](#getting-started--local-setup)
-- [Environment Variables](#environment-variables)
-- [Docker & Container Deployment](#docker--container-deployment)
-- [Security & Encryption](#security--encryption)
+  - [1. Dashboard Command Center](#1-dashboard-command-center)
+  - [2. Post Composer & Live Multi-Channel Previews](#2-post-composer--live-multi-channel-previews)
+  - [3. Ideas Kanban Studio & AI Brainstorming](#3-ideas-kanban-studio--ai-brainstorming)
+  - [4. Interactive Publishing Calendar & Content List](#4-interactive-publishing-calendar--content-list)
+  - [5. Media Asset Library](#5-media-asset-library)
+  - [6. Analytics & Publishing Velocity Dashboard](#6-analytics--publishing-velocity-dashboard)
+  - [7. Social Channel Connections & OAuth Center](#7-social-channel-connections--oauth-center)
+  - [8. Usage Quotas & Plan Billing](#8-usage-quotas--plan-billing)
+  - [9. Workspace Preferences & Theme Engine](#9-workspace-preferences--theme-engine)
+  - [10. Public Marketing & Compliance Suite](#10-public-marketing--compliance-suite)
+- [Supported Social Channels & Capabilities](#supported-social-channels--capabilities)
+- [Design System & UI/UX Architecture](#design-system--uiux-architecture)
+- [Tech Stack & Engineering Specifications](#tech-stack--engineering-specifications)
+- [Application Architecture & Data Flow](#application-architecture--data-flow)
+- [Directory Structure](#directory-structure)
+- [Application Route Map](#application-route-map)
+- [REST API Endpoints Reference](#rest-api-endpoints-reference)
+  - [Posts API (`/api/post`)](#posts-api-apipost)
+  - [Ideas API (`/api/idea`)](#ideas-api-apiidea)
+  - [Channels API (`/api/channel`)](#channels-api-apichannel)
+  - [Media Storage API (`/api/upload-image`)](#media-storage-api-apiupload-image)
+  - [System & Automation Endpoints](#system--automation-endpoints)
+- [Database Schema & Migrations (InsForge PostgreSQL)](#database-schema--migrations-insforge-postgresql)
+  - [Entity-Relationship Diagram](#entity-relationship-diagram)
+  - [Table Definitions](#table-definitions)
+  - [Row-Level Security (RLS) & JWT Extraction](#row-level-security-rls--jwt-extraction)
+  - [Migration Files & Execution](#migration-files--execution)
+- [Post State Machine & Lifecycle Transitions](#post-state-machine--lifecycle-transitions)
+- [AI Engine Architecture (Google Gemini 2.5 Flash)](#ai-engine-architecture-google-gemini-25-flash)
+- [Background Publishing Pipeline (Inngest)](#background-publishing-pipeline-inngest)
+  - [Publishing Architecture Diagram](#publishing-architecture-diagram)
+  - [Worker Functions & Idempotent Claiming](#worker-functions--idempotent-claiming)
+  - [Platform Dispatch Implementations](#platform-dispatch-implementations)
+- [Security & Production Hardening](#security--production-hardening)
+- [Getting Started & Local Development](#getting-started--local-development)
+  - [Prerequisites](#prerequisites)
+  - [Installation Steps](#installation-steps)
+  - [Third-Party Service Setup](#third-party-service-setup)
+- [Environment Variables Reference](#environment-variables-reference)
+- [Docker & Container Orchestration](#docker--container-orchestration)
 - [Available Scripts](#available-scripts)
+- [Troubleshooting & Common Questions](#troubleshooting--common-questions)
 - [License](#license)
+
+---
+
+## Executive Overview
+
+Managing social presence across fragmented platforms is tedious, prone to formatting errors, and operationally inefficient. **Media Scheduler** consolidates the entire content lifecycle into a high-performance, single-tenant web application:
+
+1. **Ideation**: Generate viral hooks, content angles, and structured briefs with Google Gemini AI. Organize ideas visually across custom Kanban columns.
+2. **Composition & Live Simulation**: Compose channel-optimized copy with dynamic character limits and preview pixel-accurate live feeds for Twitter/X, LinkedIn, Instagram, TikTok (with mobile viewport & engagement rails), Facebook, Threads, Bluesky, and YouTube.
+3. **Queueing & Idempotent Publishing**: Schedule posts to an atomic PostgreSQL queue. Inngest triggers scheduled cron runs every 10 minutes, claims posts via database locks to avoid duplicate dispatches, refreshes expired OAuth tokens, and publishes content using official APIs.
+4. **Asset Management**: Upload high-resolution media directly to InsForge Object Storage (`lemon` bucket) with magic byte validation, automatic CDN routing, and reuse across posts.
+5. **Analytics**: Monitor publishing velocity, cross-platform distributions, and day/hour posting heatmaps to optimize audience engagement.
 
 ---
 
 ## Key Features
 
 ### 1. Dashboard Command Center
-- **KPI Metrics:** Track total posts in queue, scheduled content, published history, and draft reserves in real-time via `/api/post/totals`.
-- **Personalized Header:** Time-of-day greeting, attention banner for pending drafts, and quick-action triggers for creating posts and generating ideas.
-- **AI Content Studio Ribbon:** Instant AI generation prompt bar embedded directly in the dashboard overview.
-- **Recent Activity Feed:** Live status chips (`Draft`, `Queue`, `Published`, `Failed`), scheduled dates, and channel icons.
-- **Connected Channels Quick-Status:** Real-time visibility into active OAuth tokens across all 8 networks.
+- **Real-Time KPI Counters**: Live metrics fetching from `/api/post/totals` showcasing `Queue`, `Drafts`, `Published`, and `Failed` counts.
+- **Personalized Header & Greetings**: Dynamic time-of-day greetings (Morning, Afternoon, Evening) paired with user avatar and workspace status.
+- **Quick Search Command Palette**: `Cmd+K` / `Ctrl+K` keyboard shortcut instantly opens the post creation dialog from anywhere in the app.
+- **Notification Drawer**: Header notifications bell with live status badges monitoring Inngest background engine health, queue activity, and credential warnings.
+- **Connected Accounts Ribbon**: Instant visual status of all 8 social platforms with color-coded avatar badges and single-click connection triggers.
+- **Recent Activity Timeline**: Chronological log of recent post dispatches with channel icons, status chips, timestamps, and deep links.
 
-### 2. Post Composer & Multi-Channel Feed Previews
-- **Single-Channel-Per-Post Model:** Each scheduled post targets one specific connected social channel with pixel-accurate platform previews.
-- **Inline AI Writing Assistant:** Generate, rephrase, shorten, or expand post copy directly inside the composer using Google Gemini 2.5 Flash.
-- **Dynamic Character Counter:** Real-time character counts using platform-specific `character_limit` values from the `channel_types` lookup table.
-- **Scheduled Time Picker:** Native date/time scheduling with timezone preservation via `react-day-picker`.
-- **Image Attachments:** Upload and attach images stored via InsForge Storage; both `url` and `key` are persisted in the post's `images` JSONB column.
-- **Tri-Action Publishing Toolbar:** One-click shortcuts for **Save Draft**, **Queue for Publishing**, and immediate preview.
-- **Pixel-Accurate Live Previews:** Tabbed realistic live previews for all 8 platforms:
-  - **Twitter / X:** Compact tweet view with reply/repost/like counters and timestamp.
-  - **LinkedIn:** Professional post card with company/author headline, connection degree, and engagement bar.
-  - **Instagram:** Square feed card with header avatar, photo carousel placeholder, like/comment/share icons, and caption preview.
-  - **TikTok:** Realistic 9:16 vertical smartphone viewport with creator handle, music sound ticker, right-side engagement rail (like, comment, bookmark, share), and bottom navigation overlay.
-  - **Facebook:** Classic News Feed card with privacy badge (Public), timestamp, like/react buttons, and comment box.
-  - **Threads:** Clean Meta Threads layout with avatar thread line, reply icons, and conversation simulation.
-  - **Bluesky:** Decentralized AT Protocol layout with handle, domain handle, repost, and favorite actions.
-  - **YouTube:** YouTube Community / Shorts caption preview with channel branding and subscriber badge.
+### 2. Post Composer & Live Multi-Channel Previews
+- **Single-Channel-Per-Post Architecture**: Every scheduled post targets an explicit connected account with platform-specific formatting and limits.
+- **Dynamic Character Limiter**: Enforces strict platform constraints sourced from the `channel_types` lookup table (e.g., 280 for Twitter/X, 3,000 for LinkedIn, 300 for Bluesky).
+- **Inline AI Writing Assistant**: Integrated prompt drawer powered by Google Gemini 2.5 Flash supporting 4 transformation modes:
+  - `generate`: Write new copy from a raw concept.
+  - `rephrase`: Paraphrase existing content with fresh phrasing.
+  - `shorten`: Condense text to fit character limits while retaining impact.
+  - `expand`: Add contextual depth, bullet points, and calls-to-action.
+- **Native Date & Time Scheduling**: Date picker powered by `react-day-picker` with precision time selector preserving UTC timestamps.
+- **Media Attachments**: Drag-and-drop or file upload to InsForge Object Storage; persists array of `{ url, key }` JSONB objects.
+- **Emoji Picker Integration**: Native popover emoji selector via `@ferrucc-io/emoji-picker`.
+- **Tri-Action Publish Bar**: Save as draft, queue for background publishing, or switch to immediate live preview.
+- **8 Pixel-Accurate Platform Previews**:
+  - **Twitter / X**: Realistic dark/light tweet card with user handle, verified badge, reply/repost/like counters, and timestamp.
+  - **LinkedIn**: Professional feed card featuring author headline, connection degree (`1st`), timestamp, post text, media container, and engagement footer (`Like`, `Comment`, `Repost`, `Send`).
+  - **Instagram**: Square/portrait photo card with user header, carousel indicator, heart/comment/share icons, bookmark toggle, and formatted caption preview.
+  - **TikTok**: Authentic 9:16 vertical smartphone viewport simulation featuring avatar badge, audio ticker animation, right-side interaction rail (likes, comments, bookmarks, share count), creator caption, and bottom overlay navigation.
+  - **Facebook**: Classic News Feed card with author header, privacy badge (`Public`), timestamp, reaction bar, and comment box.
+  - **Threads**: Clean Meta Threads interface with thread line, user avatar, heart, comment, repost, and share icons.
+  - **Bluesky**: AT Protocol post design with domain handle (`@handle.bsky.social`), clean typography, repost, and favorite actions.
+  - **YouTube**: Community post / Shorts preview featuring channel avatar, subscriber count, and formatted caption box.
 
-### 3. Ideas Kanban Studio
-- **AI Brainstorming Engine:** Generate 3 fresh post topics and captions based on business type and target audience via Google Gemini 2.5 Flash.
-- **Drag-and-Drop Workflow:** Move idea cards seamlessly across Kanban groups powered by `@hello-pangea/dnd`:
-  - `Unassigned` → `To Do` → `In Progress` → `Done`
-- **Image Attachments on Ideas:** Attach reference images to idea cards stored in InsForge Storage.
-- **Direct Conversion:** Single-click "Turn to Post" button instantly clones idea content into the Post Composer.
+### 3. Ideas Kanban Studio & AI Brainstorming
+- **Interactive Drag-and-Drop Kanban**: Smooth column-to-column drag powered by `@hello-pangea/dnd`.
+- **4 Seeded Workflow Columns**: `Unassigned` → `To Do` → `In Progress` → `Done` (backed by the `idea_groups` database table).
+- **AI Brainstorming Engine**: Generates 3 high-converting topic titles and descriptive draft copy tailored to the user's business type and target audience via `/api/idea/generate-ideas`.
+- **Idea Card Details**: Attach reference images, add Markdown notes, and track idea sort order.
+- **One-Click Post Conversion**: Instantly converts any idea into a Post Composer draft, pre-populating text copy and uploaded media.
 
-### 4. Interactive Publishing Calendar & List Views
-- **Monthly, Weekly, & Day Calendar:** Full visual calendar powered by `react-big-calendar` with color-coded channel pills and status markers.
-- **Custom Calendar Toolbar:** Segmented view switchers, quick navigation (Today, Prev, Next), and active date badges.
-- **Content List View:** Chronological post list with status filter pills (`All`, `Draft`, `Queue`, `Published`, `Failed`), inline edit actions (via `edit-post-dialog`), and quick rescheduling.
-- **URL-Synced Filters:** Status filters are synced to the URL query string via `nuqs` for shareable views.
+### 4. Interactive Publishing Calendar & Content List
+- **Dual Content Views**:
+  - **Calendar View**: Full calendar powered by `react-big-calendar` with Month, Week, and Day views. Posts render as interactive, color-coded pills based on channel brand colors.
+  - **Content Manager List**: Filterable chronological table with status tabs (`All`, `Queue`, `Draft`, `Published`, `Failed`), search bar, and platform dropdown.
+- **URL Query State Persistence**: Filter pills and search queries sync to browser URL search params via `nuqs` for bookmarkable, shareable views.
+- **Post Actions & Edit Dialog**: Modify scheduled times, adjust copy, manage media, or transition post states using `EditPostDialog`.
+- **Deletion Safety**: Prevents deletion of active in-flight posts (`queue` or `publishing`). Users must cancel a post first before deleting to avoid race conditions.
 
-### 5. Media Library
-- **Grid & List Views:** Browse all uploaded images attached to posts with grid or list layout toggle.
-- **Upload & Attach:** Upload images directly from the media library; assets are stored in InsForge Storage and linked to posts.
-- **Search & Preview:** Search images by filename, preview full-size in a dialog, and attach to new posts directly from the library.
+### 5. Media Asset Library
+- **Asset Grid & List Layouts**: Switch between responsive thumbnail cards and compact data rows.
+- **Direct Upload Flow**: Upload files directly to InsForge Storage (`lemon` bucket) with validation:
+  - 10 MB maximum file size limit.
+  - MIME type allowlist (`image/jpeg`, `image/png`, `image/gif`, `image/webp`).
+  - File extension verification.
+  - Binary magic bytes inspection to prevent extension spoofing.
+- **Search & Lightbox Preview**: Filter assets by file name and open full-resolution previews in a modal dialog.
+- **Attach to Post**: One-click action to create a new scheduled post directly from any library asset.
 
-### 6. Analytics Dashboard
-- **Publishing Velocity:** Track total published posts, estimated reach, and engagement rate derived from real post data.
-- **Time-Range Selector:** Switch between 7-day, 30-day, and 90-day analytics windows.
-- **Platform Breakdown:** Visualize published post distribution across all connected social channels.
-- **Weekly Cadence Heatmap:** Identify optimal posting days and times with a day-of-week/hour activity grid.
-- **Data-Driven Metrics:** All metrics computed from live `/api/post` and `/api/post/totals` responses — no mock data.
+### 6. Analytics & Publishing Velocity Dashboard
+- **Calculated Performance Metrics**: Aggregate publishing volume, estimated total reach, and average engagement rates computed from live post records.
+- **Time Range Filtering**: Toggle between 7-Day, 30-Day, and 90-Day analytical windows.
+- **Platform Distribution Chart**: Visual breakdown of published content across all 8 social networks.
+- **Publishing Cadence Heatmap**: Day-of-week by hour-slot grid (Mon–Sun × 9 AM–9 PM) highlighting posting density.
 
-### 7. Channel Connections & OAuth Center
-- **Connect & Disconnect:** Authenticate social accounts via official OAuth 2.0 with PKCE and encrypted `state` cookie protection.
-- **Token Refresh:** Automatic OAuth token refresh via `refreshOauthToken` in the Inngest publish workflow.
-- **Status Indicators:** Badge display of connection status, connected profile handle, and profile avatar fetched at connection time.
-- **Credential Encryption:** All access and refresh tokens are AES-256-GCM encrypted before saving to `user_channels`.
+### 7. Social Channel Connections & OAuth Center
+- **OAuth 2.0 with PKCE**: Secure authorization flows for social platforms with `code_verifier` and `code_challenge` support.
+- **CSRF Cookie Protection**: Cryptographic HMAC-signed `state` parameter stored in `HttpOnly`, `SameSite=Lax` cookies using `CHANNEL_OAUTH_STATE_SECRET`.
+- **AES-256-GCM Token Encryption**: Access tokens and refresh tokens are encrypted at rest with random IVs and authentication tags. Plaintext credentials never touch database storage.
+- **Automated Token Refresh**: Background Inngest workers detect expired tokens and trigger automatic OAuth token refresh cycles before dispatching posts.
 
-### 8. Settings & Theme Engine
-- **Dark Mode / Light Mode / System Theme:** Instant theme switching using `next-themes` with zero layout shift or flash.
-- **Workspace Settings:** Profile customization, timezone selection, notification preferences, and connected account management.
+### 8. Usage Quotas & Plan Billing
+- **Free Tier Quota Enforcement**: Free users are limited to 20 scheduled posts per calendar month. Limits are validated server-side on creation.
+- **Clerk Pricing Table Wrapper**: Seamless embedding of Clerk's `<PricingTable />` component for self-service subscription management.
+- **Tier Feature Matrix**: Transparent breakdown comparing Free, Creator, and Pro plan quotas and capabilities.
 
-### 9. Usage Quotas & Billing
-- **Real-Time Usage Metering:** Visual progress meters tracking monthly post volume against plan limits.
-- **Clerk Pricing Table Wrapper:** Native embedding of Clerk's `<PricingTable />` for billing management and upgrade flows.
-- **Plan Comparison Matrix:** Transparent breakdown of Free, Creator, and Pro plan limits.
+### 9. Workspace Preferences & Theme Engine
+- **Next-Themes Integration**: Instant switching between `Light`, `Dark`, and `System` color themes without flash or layout shift.
+- **Channel Account Manager**: Disconnect, reconnect, or refresh accounts with dedicated OAuth status cards.
+- **Workspace Profile**: User profile details managed through Clerk's secure user modal.
 
-### 10. Full Marketing & Public Pages Suite
-- **Modern Landing Page:** Hero section with animated badges, interactive feature showcases, channel pill carousel, and customer testimonials.
-- **Dedicated Feature Walkthrough:** Deep-dive into AI generation, multi-channel scheduling, and analytics.
-- **Dynamic Pricing Page:** Monthly vs. annual billing toggle with an interactive FAQ accordion.
-- **Channels Directory:** Dedicated page explaining connection capabilities for each supported social network.
-- **Workflow & Contact Pages:** Visual diagrams explaining end-to-end publishing, plus a contact inquiry form.
-- **Legal Compliance:** Comprehensive Privacy Policy and Terms of Service documents.
-
----
-
-## Supported Social Channels
-
-| Platform | Channel Key | OAuth Flow | Character Limit | Live Preview | Publishing |
-| :--- | :--- | :--- | :---: | :---: | :---: |
-| **Twitter / X** | `TWITTER` | OAuth 2.0 PKCE | 280 | ✅ | ✅ Active |
-| **LinkedIn** | `LINKEDIN` | OAuth 2.0 (`w_member_social`) | 3,000 | ✅ | ✅ Active |
-| **Instagram** | `INSTAGRAM` | Meta Graph API | 2,200 | ✅ | 🔧 Ready |
-| **Threads** | `THREADS` | Meta Threads API | 500 | ✅ | 🔧 Ready |
-| **Facebook** | `FACEBOOK` | Meta Graph API | 63,206 | ✅ | 🔧 Ready |
-| **Bluesky** | `BLUESKY` | AT Protocol OAuth | 300 | ✅ | 🔧 Ready |
-| **YouTube** | `YOUTUBE` | Google OAuth 2.0 | 100 | ✅ | 🔧 Ready |
-| **TikTok** | `TIKTOK` | TikTok Creator API v2 | 100 | ✅ | 🔧 Ready |
-
-> **Publishing Note:** Twitter/X and LinkedIn have end-to-end background publishing via the Inngest cron runner. All 8 platforms support live feed simulation, OAuth connection flows, encrypted token storage, and database association. Character limits are seeded in the `channel_types` table and enforced in the composer.
+### 10. Public Marketing & Compliance Suite
+- **Responsive Landing Page**: Hero section with interactive badge animations, social proof, channel pill carousels, feature highlights, and customer testimonials.
+- **Feature Directory (`/features`)**: In-depth explanations of AI generation, cross-network publishing, and analytics.
+- **Pricing Calculator (`/pricing`)**: Monthly and annual billing switch with 20% annual discount calculations and interactive FAQ accordion.
+- **Workflow Guide (`/workflow`)**: Visual architecture and step-by-step publishing walkthrough.
+- **Channels Index (`/channels`)**: Directory outlining OAuth permissions, API endpoints, and limits for each network.
+- **Contact & Support (`/contact`)**: Public inquiry and feedback submission form.
+- **Legal Compliance**: Full **Terms of Service** (`/terms`) and **Privacy Policy** (`/privacy`) compliant with social platform developer guidelines.
 
 ---
 
-## Design System & UI/UX
+## Supported Social Channels & Capabilities
 
-Media Scheduler includes a persisted Master Design System located in [`design-system/media-scheduler/`](file:///c:/Users/sugud/OneDrive/Documents/media-scheduler/design-system/).
+| Platform | Channel Key | Protocol / API | Character Limit | Live Preview | Automated Publishing | Scopes Required |
+| :--- | :--- | :--- | :---: | :---: | :---: | :--- |
+| **Twitter / X** | `TWITTER` | OAuth 2.0 PKCE (API v2) | 280 | ✅ Active | ✅ Active (Text + Images) | `tweet.read,users.read,tweet.write,offline.access,media.write` |
+| **LinkedIn** | `LINKEDIN` | OAuth 2.0 (REST Posts API `202604`) | 3,000 | ✅ Active | ✅ Active (Text + Images) | `openid,profile,email,w_member_social` |
+| **Instagram** | `INSTAGRAM` | Meta Graph API v19.0 | 2,200 | ✅ Active | 🔧 OAuth & Preview Ready | `instagram_basic,instagram_content_publish,pages_read_engagement` |
+| **Threads** | `THREADS` | Meta Threads API | 500 | ✅ Active | 🔧 OAuth & Preview Ready | `threads_basic,threads_content_publish` |
+| **Facebook** | `FACEBOOK` | Meta Graph API v19.0 | 63,206 | ✅ Active | 🔧 OAuth & Preview Ready | `pages_show_list,pages_read_engagement,pages_manage_posts` |
+| **Bluesky** | `BLUESKY` | AT Protocol OAuth | 300 | ✅ Active | 🔧 OAuth & Preview Ready | `atproto,transition:generic` |
+| **YouTube** | `YOUTUBE` | Google OAuth 2.0 (Data API v3) | 100 | ✅ Active | 🔧 OAuth & Preview Ready | `https://www.googleapis.com/auth/youtube.upload,https://www.googleapis.com/auth/youtube.readonly` |
+| **TikTok** | `TIKTOK` | TikTok Creator API v2 | 100 | ✅ Active | 🔧 OAuth & Preview Ready | `user.info.basic,video.publish,video.upload` |
+
+> **Publishing Pipeline Note**: Twitter/X and LinkedIn have production background publishing implementations with media uploads. All 8 platforms support live feed simulation, OAuth authorization, secure token encryption, and database connection records.
+
+---
+
+## Design System & UI/UX Architecture
+
+Media Scheduler follows a strict design system documented in [`design-system/media-scheduler/MASTER.md`](design-system/media-scheduler/MASTER.md).
 
 ### Design Tokens & Philosophy
-- **Aesthetic:** Editorial, modern SaaS interface built with high-density layouts, subtle micro-borders, and refined typography.
-- **Color Palette:**
-  - **Neutral Base:** Slate & Zinc (`hsl(222, 47%, 11%)` dark base; clean neutral light base)
-  - **Brand Accent:** Indigo & Violet (`hsl(238, 84%, 60%)` / `hsl(262, 83%, 58%)`)
-  - **Semantic States:** Emerald (`Published`), Amber (`Queue`/Scheduled), Slate (`Draft`), Rose (`Failed`)
-  - **Platform Brand Accents:** Twitter (#000000 / #1DA1F2), LinkedIn (#2867B2), Instagram (#E4405F), TikTok (#000000), Facebook (#1877F2), Threads (#000000), Bluesky (#1285FE), YouTube (#FF0000)
-- **Typography:** Inter / system UI font stack with high-legibility tabular figures for counters and timestamps.
-- **Component Library:** `shadcn/ui` built on Radix UI primitives with `class-variance-authority`.
-- **Animations:** `framer-motion` for page transitions and micro-interactions; `tw-animate-css` for CSS-level animations.
-- **Icons:** `lucide-react` (v1.20) and `@hugeicons/react` (v1.1.7) for comprehensive icon coverage.
-- **Elevation:** Layered translucent card surfaces with subtle borders (`border-border/50` or `border-border/70`) and delicate drop shadows.
-- **Zero Layout Shift:** Responsive layouts tested on mobile (375px), tablet (768px), desktop (1280px), and ultrawide monitors.
+- **Aesthetic**: Editorial, high-density SaaS command center with subtle micro-borders, refined typography, and soft layered elevations.
+- **Color Palette**:
+  - **Background**: Neutral light (`hsl(0, 0%, 100%)`) / Dark Slate (`hsl(222, 47%, 11%)`)
+  - **Surface Cards**: Light card (`hsl(0, 0%, 100%)`) / Dark card (`hsl(217, 33%, 17%)`)
+  - **Primary Accent**: Royal Indigo (`hsl(238, 84%, 60%)`) to Violet (`hsl(262, 83%, 58%)`)
+  - **Semantic States**: Emerald (`Published`), Amber (`Queue`), Slate (`Draft`), Rose (`Failed`), Sky (`Publishing`), Gray (`Cancelled`)
+  - **Social Accents**: Twitter (`#000000`/`#1DA1F2`), LinkedIn (`#2867B2`), Instagram (`#E4405F`), TikTok (`#000000`), Facebook (`#1877F2`), Threads (`#000000`), Bluesky (`#1285FE`), YouTube (`#FF0000`)
+- **Typography**: Inter / system UI font stack with high-legibility tabular figures (`tabular-nums`) for counters, character limits, and dates.
+- **Component Primitives**: Radix UI primitives styled via `class-variance-authority` and `tailwind-merge`.
+- **Motion & Feedback**: Micro-interactions with `framer-motion` and feedback banners powered by `sonner`.
 
 ---
 
-## Tech Stack
+## Tech Stack & Engineering Specifications
 
-| Category | Technology | Version |
-| :--- | :--- | :--- |
-| **Framework** | [Next.js](https://nextjs.org/) (App Router, standalone output) | 16.2.9 |
-| **Language** | [TypeScript](https://www.typescriptlang.org/) | ^5 |
-| **UI Library** | [React](https://react.dev/) | 19.2.4 |
-| **Styling** | [Tailwind CSS v4](https://tailwindcss.com/) | ^4 |
-| **Components** | [shadcn/ui](https://ui.shadcn.com/) + [Radix UI](https://www.radix-ui.com/) | shadcn ^4.11 / radix-ui ^1.6 |
-| **Base UI** | [@base-ui/react](https://base-ui.com/) | ^1.5.0 |
-| **Animations** | [Framer Motion](https://www.framer.com/motion/) | ^12.40 |
-| **Theme Support** | [next-themes](https://github.com/pacocoursey/next-themes) | ^0.4.6 |
-| **Authentication** | [Clerk Auth](https://clerk.com/) (`@clerk/nextjs`) | ^7.5.3 |
-| **Database & BaaS** | [InsForge](https://insforge.dev) (`@insforge/sdk`) | ^1.4.2 |
-| **AI Engine** | Google Gemini 2.5 Flash (via Gemini API + InsForge AI gateway fallback) | gemini-2.5-flash |
-| **Background Jobs** | [Inngest](https://www.inngest.com/) (cron-based publish scheduler) | ^4.6.0 |
-| **State & Data Fetching** | [TanStack Query v5](https://tanstack.com/query) | ^5.101.0 |
-| **URL State** | [nuqs](https://nuqs.47ng.com/) | ^2.8.9 |
-| **Calendar Engine** | [react-big-calendar](https://github.com/jquense/react-big-calendar) + `date-fns` | ^1.20 / ^4.4 |
-| **Drag & Drop** | [@hello-pangea/dnd](https://github.com/hello-pangea/dnd) | ^18.0.1 |
-| **Carousel** | [embla-carousel-react](https://www.embla-carousel.com/) | ^8.6.0 |
-| **Date Picker** | [react-day-picker](https://react-day-picker.js.org/) | ^10.0.1 |
-| **Command Palette** | [cmdk](https://cmdk.paco.me/) | ^1.1.1 |
-| **Emoji Picker** | [@ferrucc-io/emoji-picker](https://github.com/ferrucc-io/emoji-picker) | ^0.1.1 |
-| **Toast Notifications** | [sonner](https://sonner.emilkowal.ski/) | ^2.0.7 |
-| **Icons** | [lucide-react](https://lucide.dev/) + [@hugeicons/react](https://hugeicons.com/) | ^1.20 / ^1.1.7 |
-| **Cryptography** | Node.js native `crypto` (AES-256-GCM ciphering) | Built-in |
+| Category | Technology | Version | Purpose |
+| :--- | :--- | :--- | :--- |
+| **Framework** | [Next.js](https://nextjs.org/) (App Router) | 16.2.9 | React server components, route handlers, standalone output |
+| **Language** | [TypeScript](https://www.typescriptlang.org/) | ^5.0.0 | Full end-to-end type safety |
+| **UI Library** | [React](https://react.dev/) | 19.2.4 | Client & server rendering with React 19 features |
+| **Styling** | [Tailwind CSS v4](https://tailwindcss.com/) | ^4.0.0 | Utility-first CSS engine with `@tailwindcss/postcss` |
+| **Components** | [shadcn/ui](https://ui.shadcn.com/) + [Radix UI](https://www.radix-ui.com/) | shadcn ^4.11 / radix ^1.6 | Accessible UI primitives (dialogs, dropdowns, popovers, tabs) |
+| **Base UI** | [@base-ui/react](https://base-ui.com/) | ^1.5.0 | Supplementary accessible interface components |
+| **Animations** | [Framer Motion](https://www.framer.com/motion/) | ^12.40.0 | Fluid view transitions and modal micro-interactions |
+| **Theme Engine** | [next-themes](https://github.com/pacocoursey/next-themes) | ^0.4.6 | Theme persistence (`dark`, `light`, `system`) |
+| **Authentication** | [Clerk](https://clerk.com/) (`@clerk/nextjs`) | ^7.5.3 | User auth, session cookies, JWT minting, `<PricingTable />` |
+| **Database & BaaS** | [InsForge](https://insforge.dev) (`@insforge/sdk`) | ^1.4.2 | PostgreSQL backend, Row Level Security, Object Storage |
+| **AI Engine** | [Google Gemini 2.5 Flash](https://aistudio.google.com/) | `gemini-2.5-flash` | Copy generation, rephrasing, shortening, and idea ideation |
+| **Background Jobs** | [Inngest](https://www.inngest.com/) (`inngest`) | ^4.6.0 | Serverless cron scheduler and fan-out event dispatch pipeline |
+| **State & Cache** | [TanStack Query v5](https://tanstack.com/query) | ^5.101.0 | Asynchronous data fetching, caching, and cache invalidation |
+| **URL Query State** | [nuqs](https://nuqs.47ng.com/) | ^2.8.9 | URL search parameter syncing for filters and searches |
+| **Calendar Engine** | [react-big-calendar](https://github.com/jquense/react-big-calendar) | ^1.20.0 | Interactive Month, Week, and Day calendar scheduling view |
+| **Date Utilities** | [date-fns](https://date-fns.org/) | ^4.4.0 | Date math, parsing, and relative formatting |
+| **Drag and Drop** | [@hello-pangea/dnd](https://github.com/hello-pangea/dnd) | ^18.0.1 | Drag and drop columns for Ideas Kanban board |
+| **Date Picker** | [react-day-picker](https://react-day-picker.js.org/) | ^10.0.1 | Calendar popover component in post composer |
+| **Command Palette** | [cmdk](https://cmdk.paco.me/) | ^1.1.1 | Quick search and shortcut palette |
+| **Emoji Picker** | [@ferrucc-io/emoji-picker](https://github.com/ferrucc-io/emoji-picker) | ^0.1.1 | Visual emoji selector in composer |
+| **Toast Engine** | [sonner](https://sonner.emilkowal.ski/) | ^2.0.7 | Toast notifications for async user actions |
+| **Icons** | [lucide-react](https://lucide.dev/) + [@hugeicons/react](https://hugeicons.com/) | ^1.20 / ^1.1.7 | High-density icon sets across the interface |
+| **Cryptography** | Node.js `crypto` | Built-in | AES-256-GCM token ciphering and HMAC-SHA256 signatures |
+| **Containerization** | Docker & Docker Compose | Multi-stage | Alpine-based minimal production image with standalone output |
 
 ---
 
-## Application Architecture & Routes
+## Application Architecture & Data Flow
+
+```mermaid
+graph TD
+    User([User Browser])
+    
+    subgraph Frontend ["Frontend Layer (Next.js 16 App Router)"]
+        Landing["Marketing Suite (/, /pricing, /features, etc.)"]
+        AuthShell["Clerk Auth Provider"]
+        DashboardShell["Dashboard Layout (Sidebar + Header)"]
+        Composer["Post Composer + 8 Live Previews"]
+        IdeasBoard["Ideas Kanban Studio"]
+        CalendarView["Publishing Calendar & List"]
+        AnalyticsView["Analytics Dashboard"]
+    end
+    
+    subgraph ServerLayer ["Next.js Server & API Route Handlers"]
+        API_Post["/api/post & /api/post/totals"]
+        API_Idea["/api/idea & /api/idea/generate-ideas"]
+        API_Channel["/api/channel (connect/callback/disconnect)"]
+        API_Upload["/api/upload-image (Magic Byte Validation)"]
+        InngestWebhook["/api/inngest (Webhook Intake)"]
+    end
+    
+    subgraph ExternalServices ["External Services & APIs"]
+        ClerkSvc["Clerk Auth (JWT sub Claim)"]
+        GeminiAI["Google Gemini 2.5 Flash API"]
+        InngestEngine["Inngest Automation Engine (Cron & Events)"]
+        SocialAPIs["Social APIs (Twitter v2, LinkedIn REST, Meta Graph)"]
+    end
+    
+    subgraph BaaSLayer ["InsForge Backend (PostgreSQL + Storage)"]
+        PostgresDB[("PostgreSQL Database (RLS Enforced)")]
+        ObjStorage[("InsForge Storage ('lemon' bucket)")]
+    end
+    
+    User --> Landing
+    User --> AuthShell
+    AuthShell --> DashboardShell
+    DashboardShell --> Composer
+    DashboardShell --> IdeasBoard
+    DashboardShell --> CalendarView
+    DashboardShell --> AnalyticsView
+    
+    Composer --> API_Post
+    Composer --> API_Upload
+    IdeasBoard --> API_Idea
+    CalendarView --> API_Post
+    AnalyticsView --> API_Post
+    
+    API_Post --> ClerkSvc
+    API_Post --> PostgresDB
+    API_Idea --> GeminiAI
+    API_Idea --> PostgresDB
+    API_Upload --> ObjStorage
+    API_Channel --> SocialAPIs
+    API_Channel --> PostgresDB
+    
+    InngestEngine -- "Cron (Every 10m)" --> InngestWebhook
+    InngestWebhook --> PostgresDB
+    InngestWebhook -- "Publish Tweet/Post" --> SocialAPIs
+```
+
+---
+
+## Directory Structure
 
 ```
 media-scheduler/
-├── app/
-│   ├── (auth)/                         # Clerk authentication wrappers
-│   ├── (dashboard)/                    # Authenticated app shell (dashboard layout)
-│   │   ├── analytics/                  # Analytics & publishing velocity dashboard
-│   │   ├── billing/                    # Usage quotas & Clerk PricingTable
-│   │   ├── content/                    # Post list view with status filters
-│   │   ├── dashboard/                  # Main KPI dashboard command center
-│   │   ├── ideas/                      # Ideas Kanban board + AI brainstorm
-│   │   ├── media/                      # Media library (images, uploads)
-│   │   ├── schedule/                   # Post composer + calendar views
-│   │   └── settings/                   # Profile, theme & workspace preferences
-│   ├── (marketing)/                    # Public marketing pages
-│   │   ├── channels/                   # Social channel capabilities page
-│   │   ├── contact/                    # Contact inquiry form
-│   │   ├── features/                   # Comprehensive product features
-│   │   ├── pricing/                    # Plans, billing toggle & FAQ
+├── app/                                # Next.js App Router root
+│   ├── (auth)/                         # Clerk auth layout & wrapper pages
+│   ├── (dashboard)/                    # Authenticated workspace layout
+│   │   ├── analytics/                  # Publishing velocity & platform breakdown
+│   │   ├── billing/                    # Quota meter & Clerk PricingTable
+│   │   ├── content/                    # Filterable chronological post list
+│   │   ├── dashboard/                  # KPI overview, recent activity, live ribbon
+│   │   ├── ideas/                      # Ideas Kanban studio & AI ideation
+│   │   ├── media/                      # Asset library (grid/list view, upload)
+│   │   ├── schedule/                   # Post composer & react-big-calendar
+│   │   ├── settings/                   # Appearance, preferences & channel management
+│   │   └── layout.tsx                  # Dashboard shell with sidebar & header
+│   ├── (marketing)/                    # Public marketing & compliance routes
+│   │   ├── channels/                   # Supported channels overview
+│   │   ├── contact/                    # Contact & inquiry form
+│   │   ├── features/                   # Feature capabilities deep dive
+│   │   ├── pricing/                    # Plan matrix, FAQ, annual toggle
 │   │   ├── privacy/                    # Privacy policy
 │   │   ├── terms/                      # Terms of service
-│   │   └── workflow/                   # Visual multi-channel scheduling guide
+│   │   ├── workflow/                   # Visual scheduling process guide
+│   │   └── layout.tsx                  # Marketing navigation header & footer
 │   ├── api/                            # Next.js Route Handlers
-│   │   ├── channel/                    # Channel connect / callback / disconnect
+│   │   ├── channel/                    # Channel listing, connect, callback, disconnect
 │   │   ├── health/                     # Health check endpoint
-│   │   ├── idea/                       # Idea CRUD + AI generation
-│   │   ├── inngest/                    # Inngest event intake webhook
-│   │   ├── post/                       # Post CRUD + generate-post + totals
-│   │   └── upload-image/               # Image upload to InsForge Storage
-│   ├── routes/                         # Shared route page implementations
-│   │   ├── dashboard/                  # Dashboard, schedule, ideas, billing, settings
-│   │   ├── landing/                    # Landing page sections
-│   │   ├── sign-in/                    # Clerk sign-in page
-│   │   └── sign-up/                    # Clerk sign-up page
-│   ├── layout.tsx                      # Root layout (Clerk + ThemeProvider + QueryProvider)
-│   └── page.tsx                        # Public landing page
-├── components/
-│   ├── channel-avatar.tsx              # Platform-branded avatar with color ring
-│   ├── content-textarea.tsx            # AI-powered textarea with actions toolbar
-│   ├── dark-mode-toggle.tsx            # Light/Dark/System theme switcher
-│   ├── dashboard-header.tsx            # Dashboard sticky top bar
-│   ├── logo.tsx                        # Brand logo component
-│   ├── query-provider.tsx              # TanStack Query provider wrapper
-│   ├── theme-provider.tsx              # next-themes provider
-│   ├── idea/                           # Idea card, Kanban column, AI panel
-│   ├── schedule/                       # Post composer, calendar, list, AI assistant
-│   │   ├── ai-assistant.tsx            # Inline AI writing panel
-│   │   ├── calendar-view.tsx           # react-big-calendar integration
-│   │   ├── create-post-dialog.tsx      # Full post composer dialog (8 platform previews)
-│   │   ├── edit-post-dialog.tsx        # Edit scheduled/draft post dialog
-│   │   ├── list-view.tsx               # Filterable chronological post list
-│   │   ├── schedule-date-picker.tsx    # Date/time scheduler with react-day-picker
-│   │   ├── schedule-toolbar.tsx        # Save/Queue/Draft action toolbar
-│   │   └── preview/                    # 8 platform-specific live preview components
-│   │       ├── bluesky-preview.tsx
-│   │       ├── facebook-preview.tsx
-│   │       ├── instagram-preview.tsx
-│   │       ├── linkedin-preview.tsx
-│   │       ├── thread-preview.tsx
-│   │       ├── tiktok-preview.tsx
-│   │       ├── twitter-preview.tsx
-│   │       └── youtube-preview.tsx
-│   ├── settings/                       # Settings form components
-│   └── ui/                             # shadcn/ui primitives (button, card, dialog, etc.)
-├── lib/
-│   ├── ai.ts                           # Google Gemini API client + InsForge AI fallback
-│   ├── encryption.ts                   # AES-256-GCM encrypt/decrypt for OAuth tokens
-│   ├── insforge-server.ts              # InsForge server & admin clients (Clerk JWT)
-│   ├── utils.ts                        # Tailwind merge utility
-│   ├── db/                             # SQL migration files & schema diagram
-│   │   ├── create-social-scheduling-tables.sql
-│   │   ├── fix-channel-types-rls.sql
-│   │   └── schema-diagram.md
-│   └── social-oauth/                   # OAuth helpers (PKCE, state cookie, token exchange)
-│       ├── index.ts                    # refreshOauthToken + exchange helpers
-│       ├── pkce.ts                     # PKCE code verifier/challenge generation
-│       ├── state.ts                    # Encrypted state cookie management
-│       └── types.ts                    # OAuth provider configuration types
-├── inngest/
+│   │   ├── idea/                       # Idea CRUD & AI generation
+│   │   ├── inngest/                    # Inngest webhook route handler
+│   │   ├── post/                       # Post CRUD, totals, AI generation
+│   │   └── upload-image/               # Secure image upload to InsForge Storage
+│   ├── globals.css                     # Global Tailwind CSS v4 design tokens
+│   ├── layout.tsx                      # Root layout (Clerk, Query, Theme providers)
+│   └── page.tsx                        # Root entry redirecting to landing
+├── components/                         # Modular React components
+│   ├── channel-avatar.tsx              # Channel avatar with platform ring & badge
+│   ├── content-textarea.tsx            # Composer textarea with action triggers
+│   ├── dark-mode-toggle.tsx            # Light/Dark/System theme selector
+│   ├── dashboard-header.tsx            # Header with breadcrumbs, Cmd+K, notifications
+│   ├── logo.tsx                        # Vector brand logo
+│   ├── query-provider.tsx              # TanStack Query client wrapper
+│   ├── theme-provider.tsx              # next-themes wrapper
+│   ├── idea/                           # Ideas Kanban components
+│   │   ├── generate-ideas-popover.tsx  # Gemini AI idea generation modal
+│   │   ├── idea-dialog.tsx             # Create & edit idea modal
+│   │   └── idea-kanban.tsx             # Drag-and-drop board with columns
+│   ├── schedule/                       # Scheduling & post creation components
+│   │   ├── ai-assitant.tsx             # Inline AI writing drawer
+│   │   ├── calendar-view.tsx           # react-big-calendar calendar container
+│   │   ├── create-post-dialog.tsx      # Multi-channel composer with 8 previews
+│   │   ├── edit-post-dialog.tsx        # Post edit, rescheduling & cancellation dialog
+│   │   ├── ideas-list.tsx              # Quick idea selector drawer
+│   │   ├── list-view.tsx               # Content table with status filter badges
+│   │   ├── post-calendar/              # Calendar styles and custom event pills
+│   │   ├── preview/                    # 8 realistic feed preview simulators
+│   │   │   ├── bluesky-preview.tsx     # Bluesky AT Protocol preview
+│   │   │   ├── facebook-preview.tsx    # Facebook News Feed preview
+│   │   │   ├── instagram-preview.tsx   # Instagram post preview
+│   │   │   ├── linkedin-preview.tsx    # LinkedIn feed card preview
+│   │   │   ├── thread-preview.tsx      # Meta Threads conversation preview
+│   │   │   ├── tiktok-preview.tsx      # TikTok 9:16 vertical smartphone preview
+│   │   │   ├── twitter-preview.tsx     # Twitter / X tweet preview
+│   │   │   └── youtube-preview.tsx     # YouTube Community / Shorts preview
+│   │   ├── schedule-date-picker.tsx    # Popover date & time picker
+│   │   └── schedule-toolbar.tsx        # Draft, queue, and action toolbar
+│   ├── settings/                       # Workspace & account settings
+│   │   └── channels-tab.tsx            # OAuth connection cards for 8 platforms
+│   └── ui/                             # 32+ shadcn/ui primitives (Radix UI)
+├── constants/                          # System constants
+│   ├── channels.ts                     # ChannelTypeEnum, colors, limits, icons
+│   └── post.ts                         # POST_STATUS enum & ALLOWED_TRANSITIONS
+├── design-system/                      # Master Design System documentation
+│   └── media-scheduler/               # Design tokens, layouts & page specifications
+├── hooks/                              # Custom React hooks
+│   └── use-mobile.ts                   # Responsive screen breakpoint detector
+├── inngest/                            # Inngest background automation
 │   ├── client.ts                       # Inngest client initialization
 │   └── functions/
-│       └── publish-scheduled-posts.ts  # Cron + event-driven publish pipeline
-├── constants/
-│   └── channels.ts                     # ChannelTypeEnum & platform metadata
-├── hooks/
-│   └── use-mobile.ts                   # Responsive mobile breakpoint hook
-├── types/
-│   ├── channel.type.ts                 # ChannelType TypeScript type
-│   ├── idea.type.ts                    # IdeaType TypeScript type
-│   └── post.type.ts                    # PostType & CalendarPostType TypeScript types
-├── design-system/                      # Persisted design system specifications
-├── public/                             # Static assets
-├── Dockerfile                          # Multi-stage production Docker build
-├── docker-compose.yml                  # Docker Compose configuration
-└── next.config.ts                      # Next.js config (standalone output, image domains)
+│       └── publish-scheduled-posts.ts  # Cron claimer + individual post publisher
+├── lib/                                # Server utilities & core integrations
+│   ├── ai.ts                           # Gemini 2.5 Flash client + InsForge AI fallback
+│   ├── encryption.ts                   # AES-256-GCM ciphering for OAuth tokens
+│   ├── insforge-server.ts              # InsForge SDK client with Clerk JWT auth
+│   ├── utils.ts                        # Tailwind class merger utility
+│   ├── db/                             # SQL migrations & schema documentation
+│   │   ├── 002-add-publishing-cancelled-status.sql # Status check constraint & indexes
+│   │   ├── create-social-scheduling-tables.sql     # Baseline table schema
+│   │   ├── fix-channel-types-rls.sql               # Lookup table RLS policies
+│   │   └── schema-diagram.md                       # Textual ER diagram
+│   └── social-oauth/                   # Social platform OAuth helpers
+│       ├── index.ts                    # Providers registry, token exchange, refresh
+│       ├── pkce.ts                     # PKCE code verifier and challenge generator
+│       ├── state.ts                    # Encrypted state cookie generator/validator
+│       └── types.ts                    # OAuth provider interfaces
+├── public/                             # Static assets, branding & icons
+├── types/                              # TypeScript type definitions
+│   ├── channel.type.ts                 # ChannelType & connection types
+│   ├── idea.type.ts                    # IdeaType & Kanban card interfaces
+│   └── post.type.ts                    # PostType, CalendarPostType, ImageObject
+├── .env.example                        # Template for environment variables
+├── Dockerfile                          # Production multi-stage Alpine Dockerfile
+├── docker-compose.yml                  # Docker Compose orchestration
+├── next.config.ts                      # Standalone build & HTTP security headers
+├── package.json                        # Project dependencies & scripts
+└── tsconfig.json                       # TypeScript compiler configuration
 ```
 
-### Full Route Map
+---
 
-| Route Path | Access | Description |
+## Application Route Map
+
+| Route Path | Access Level | Description |
 | :--- | :--- | :--- |
-| `/` | Public | Landing page with features, social proof, and CTA |
-| `/features` | Public | Comprehensive product features and capabilities |
-| `/pricing` | Public | Plans, annual/monthly toggle, features table, FAQs |
-| `/workflow` | Public | Visual explanation of the multi-channel scheduling workflow |
-| `/channels` | Public | Information on all 8 supported social channels |
-| `/contact` | Public | User support & inquiry contact form |
-| `/privacy` | Public | Privacy policy and data handling documentation |
+| `/` | Public | Marketing landing page with feature cards, social proof, and CTA |
+| `/features` | Public | Comprehensive product features and capabilities overview |
+| `/pricing` | Public | Plan tiers, annual billing switch (20% off), and FAQ accordion |
+| `/workflow` | Public | Visual explanation of the multi-channel scheduling pipeline |
+| `/channels` | Public | Information and specifications for all 8 supported social networks |
+| `/contact` | Public | User support and inquiry contact form |
+| `/privacy` | Public | Privacy policy and data retention compliance document |
 | `/terms` | Public | Terms of service and acceptable use agreement |
 | `/routes/sign-in` | Public | Clerk authentication login portal |
 | `/routes/sign-up` | Public | Clerk authentication registration portal |
-| `/dashboard` | Protected | Dashboard KPI overview, metrics, recent posts |
-| `/ideas` | Protected | Drag-and-drop Kanban idea board with AI brainstorm |
-| `/schedule` | Protected | Post composer with 8-channel previews & calendar |
-| `/content` | Protected | Filterable list view of all posts by status |
-| `/media` | Protected | Media library — browse, upload, and manage images |
-| `/analytics` | Protected | Publishing velocity, reach estimates, cadence heatmap |
-| `/billing` | Protected | Usage counters, plan tiers, and Clerk `<PricingTable />` |
-| `/settings` | Protected | Appearance, theme, timezone, and workspace preferences |
+| `/dashboard` | Protected | Dashboard KPI overview, recent activity, and quick actions |
+| `/schedule` | Protected | Post composer with 8-channel live previews and interactive calendar |
+| `/content` | Protected | Filterable chronological list of all posts with status tabs |
+| `/ideas` | Protected | Drag-and-drop Kanban idea studio with AI brainstorming |
+| `/media` | Protected | Media asset library with grid/list views and direct upload |
+| `/analytics` | Protected | Publishing velocity, estimated reach, and posting cadence heatmap |
+| `/billing` | Protected | Plan usage counters, feature limits, and Clerk `<PricingTable />` |
+| `/settings` | Protected | Appearance (light/dark/system), timezone, and channel OAuth management |
 
 ---
 
-## API Endpoints Reference
+## REST API Endpoints Reference
 
-### Posts (`/api/post`)
-- `GET /api/post` — Fetch user's scheduled posts (supports `status` filter: `queue`, `draft`, `published`, `failed`; supports `channel_id` filter).
-- `POST /api/post` — Create a new scheduled post. Accepts `content`, `images`, `user_channel_id`, `scheduled_at`, `status` (`draft` | `queue`).
-- `GET /api/post/[id]` — Retrieve a specific post with joined `user_channels` and `channel_types` data.
-- `PATCH /api/post/[id]` — Update post content, images, scheduled time, or status.
-- `DELETE /api/post/[id]` — Delete a scheduled post.
-- `GET /api/post/totals` — Return aggregate counts: `totalQueue`, `totalPublished`, `totalFailed`, `totalDrafts`.
-- `POST /api/post/generate-post` — AI content generation endpoint using Gemini 2.5 Flash (supports `generate`, `rephrase`, `shorten`, `expand` actions).
+All API routes enforce authentication via Clerk session tokens (`auth()`). Unauthenticated requests return `401 Unauthorized`.
 
-### Ideas (`/api/idea`)
-- `GET /api/idea` — Fetch all ideas for the authenticated user, grouped by `idea_groups`.
-- `POST /api/idea` — Create a new idea card with title, description, group, images, and sort order.
-- `PATCH /api/idea/[id]` — Update idea title, description, group (Kanban column), images, or sort order.
-- `DELETE /api/idea/[id]` — Delete an idea card.
-- `POST /api/idea/generate` — Generate 3 AI idea suggestions via Gemini 2.5 Flash.
+### Posts API (`/api/post`)
 
-### Social Channels & OAuth (`/api/channel`)
-- `GET /api/channel` — List all connected social channels (`user_channels`) for the authenticated user, with joined `channel_types`.
-- `GET /api/channel/connect` — Generate OAuth authorization URL with PKCE challenge and encrypted state cookie.
-- `GET /api/channel/callback` — Exchange OAuth authorization code for access/refresh tokens; encrypt and persist to `user_channels`.
-- `DELETE /api/channel/disconnect` — Revoke and remove a connected social channel.
+#### `GET /api/post`
+Fetches the authenticated user's scheduled posts.
+- **Query Parameters**:
+  - `status` *(optional)*: Filter by post status (`draft`, `queue`, `publishing`, `published`, `failed`, `cancelled`).
+  - `channelIds` *(optional)*: Comma-separated list of `user_channel_id` values.
+  - `group_by_date` *(optional)*: When `"true"`, groups posts into date-keyed buckets for list views.
+- **Response `200 OK`**:
+  ```json
+  {
+    "success": true,
+    "data": {
+      "posts": [
+        {
+          "id": "uuid",
+          "content": "Excited to share our latest product update!",
+          "images": [{ "url": "https://...", "key": "images/..." }],
+          "scheduled_at": "2026-09-15T14:00:00.000Z",
+          "status": "queue",
+          "published_url": null,
+          "user_channel_id": "uuid",
+          "user_channels": {
+            "id": "uuid",
+            "handle": "@alexcreator",
+            "profile_image": "https://...",
+            "channel_types": { "id": "uuid", "type": "TWITTER", "name": "Twitter / X" }
+          }
+        }
+      ]
+    }
+  }
+  ```
 
-### Other Endpoints
-- `GET /api/health` — Health check endpoint returning `{ status: "ok" }`.
-- `POST /api/inngest` — Inngest event intake webhook (receives and routes background job events).
-- `POST /api/upload-image` — Upload an image to InsForge Storage; returns `{ url, key }` for persistence.
+#### `POST /api/post`
+Creates one or more scheduled posts. Enforces monthly free-tier quotas (20 posts/month).
+- **Request Body**:
+  ```json
+  {
+    "posts": [
+      {
+        "channelTypeId": "uuid",
+        "content": "Post caption here...",
+        "images": [{ "url": "https://...", "key": "images/..." }]
+      }
+    ],
+    "scheduledAt": "2026-09-15T14:00:00.000Z",
+    "status": "queue"
+  }
+  ```
+- **Response `200 OK`**:
+  ```json
+  { "success": true, "data": { "posts": [ { "id": "uuid", "status": "queue" } ] } }
+  ```
+
+#### `PATCH /api/post/[id]`
+Updates post content, images, scheduled time, or status. Validates state machine transitions.
+- **Request Body**:
+  ```json
+  {
+    "content": "Updated caption...",
+    "scheduledAt": "2026-09-16T10:00:00.000Z",
+    "status": "cancelled"
+  }
+  ```
+- **Response `200 OK`**: Returns updated post object.
+- **Error `409 Conflict`**: If the requested status transition is invalid.
+
+#### `DELETE /api/post/[id]`
+Deletes a post. Active posts in `queue` or `publishing` cannot be deleted directly — they must be cancelled first to ensure worker safety.
+- **Response `200 OK`**: `{ "success": true, "data": null }`
+- **Error `409 Conflict`**: If post is in `queue` or `publishing` status.
+
+#### `GET /api/post/totals`
+Retrieves aggregate post metrics for dashboard counters.
+- **Response `200 OK`**:
+  ```json
+  {
+    "totalDrafts": 5,
+    "totalQueue": 12,
+    "totalPublished": 48,
+    "totalFailed": 1
+  }
+  ```
+
+#### `POST /api/post/generate-post`
+AI post assistant endpoint using Google Gemini 2.5 Flash.
+- **Request Body**:
+  ```json
+  {
+    "action": "generate",
+    "prompt": "Announce our new AI features for marketing teams",
+    "content": "",
+    "channelType": "LINKEDIN",
+    "characterLimit": 3000
+  }
+  ```
+- **Response `200 OK`**: `{ "content": "Generated post copy ready for publication..." }`
 
 ---
 
-## Database Schema (InsForge PostgreSQL)
+### Ideas API (`/api/idea`)
 
-Media Scheduler uses [InsForge](https://insforge.dev) as its PostgreSQL backend. Row Level Security (RLS) is enforced on all user tables via a `requesting_user_id()` function that reads the Clerk JWT `sub` claim.
+#### `GET /api/idea`
+Fetches all user ideas grouped into their respective Kanban columns.
+- **Response `200 OK`**:
+  ```json
+  {
+    "groups": [
+      {
+        "id": "uuid",
+        "title": "To Do",
+        "ideas": [
+          {
+            "id": "uuid",
+            "title": "5 Tips for Social Growth",
+            "description": "Short-form video breakdown...",
+            "images": [],
+            "columnId": "uuid",
+            "sortOrder": 0
+          }
+        ]
+      }
+    ]
+  }
+  ```
 
-### Schema Overview
+#### `POST /api/idea`
+Creates or updates an idea card. If `id` is provided, updates the existing idea; otherwise inserts a new card.
+- **Request Body**:
+  ```json
+  {
+    "id": "uuid (optional for update)",
+    "title": "Behind the scenes workflow",
+    "description": "Show how we plan weekly content",
+    "groupId": "uuid",
+    "images": [],
+    "sortOrder": 1
+  }
+  ```
+- **Response `200 OK`**: `{ "data": { "id": "uuid", "title": "..." } }`
 
+#### `DELETE /api/idea/[id]`
+Removes an idea card.
+- **Response `200 OK`**: `{ "success": true }`
+
+#### `POST /api/idea/generate-ideas`
+Generates 3 structured idea concepts using Google Gemini 2.5 Flash. Requires Pro or Premium plan (or development mode).
+- **Request Body**:
+  ```json
+  {
+    "businessType": "SaaS B2B Productivity",
+    "targetAudience": "Product managers and team leads"
+  }
+  ```
+- **Response `200 OK`**:
+  ```json
+  {
+    "ideas": [
+      { "title": "The 3 Bottlenecks in Async Standups", "description": "Break down common failure points..." },
+      { "title": "How We Cut Sprint Planning by 50%", "description": "Step-by-step framework..." },
+      { "title": "Tool Fatigue is Real", "description": "Why fewer tools lead to better execution..." }
+    ]
+  }
+  ```
+
+---
+
+### Channels API (`/api/channel`)
+
+#### `GET /api/channel`
+Returns all 8 supported channel types joined with user connection status.
+- **Query Parameters**: `filter` (`connected` | `unconnected`).
+- **Response `200 OK`**:
+  ```json
+  {
+    "channels": [
+      {
+        "id": "uuid",
+        "type": "TWITTER",
+        "name": "Twitter / X",
+        "color": "#000000",
+        "character_limit": 280,
+        "connected": true,
+        "user_channel_id": "uuid",
+        "handle": "@brandhandle",
+        "profile_image": "https://..."
+      }
+    ],
+    "totalChannels": 8,
+    "connectedCount": 2
+  }
+  ```
+
+#### `POST /api/channel/connect`
+Initiates an OAuth 2.0 flow for a given platform. Returns an authorization URL with PKCE and an encrypted state cookie.
+- **Request Body**: `{ "channelTypeId": "uuid" }`
+- **Response `200 OK`**: `{ "success": true, "data": { "url": "https://x.com/i/oauth2/authorize?..." } }`
+- **Error `503 Service Unavailable`**: If server OAuth credentials for that platform are not configured.
+
+#### `GET /api/channel/callback`
+Handles OAuth redirects from social providers, exchanges authorization code for tokens, encrypts tokens with AES-256-GCM, and persists to `user_channels`. Redirects user to `/settings?tab=channels`.
+
+#### `POST /api/channel/disconnect`
+Revokes connection tokens and sets `is_connected = false` and `is_active = false`.
+- **Request Body**: `{ "userChannelId": "uuid" }`
+- **Response `200 OK`**: `{ "success": true }`
+
+---
+
+### Media Storage API (`/api/upload-image`)
+
+#### `POST /api/upload-image`
+Uploads a media asset to InsForge Storage (`lemon` bucket) with multi-layer validation.
+- **Content-Type**: `multipart/form-data` (`file` field).
+- **Validation**:
+  - Max file size: **10 MB**.
+  - MIME type allowlist: `image/jpeg`, `image/png`, `image/gif`, `image/webp`.
+  - Extension allowlist: `.jpg`, `.jpeg`, `.png`, `.gif`, `.webp`.
+  - Magic byte verification: validates binary file header against declared MIME type.
+  - Server-generated key: `images/${userId}/${timestamp}-${sanitizedName}`.
+- **Response `200 OK`**:
+  ```json
+  {
+    "success": true,
+    "data": {
+      "image": {
+        "key": "images/user_xxx/1741624000-banner.png",
+        "url": "https://project.us-east.insforge.app/storage/v1/object/public/lemon/images/..."
+      }
+    }
+  }
+  ```
+
+---
+
+### System & Automation Endpoints
+
+#### `GET /api/health`
+Health check endpoint returning system status.
+- **Response `200 OK`**: `{ "status": "ok" }`
+
+#### `POST /api/inngest`
+Inngest automation webhook intake. Handles execution triggers, step progress, and cron requests from the Inngest engine.
+
+---
+
+## Database Schema & Migrations (InsForge PostgreSQL)
+
+Media Scheduler uses **InsForge PostgreSQL** with strict Row-Level Security (RLS) policies. User isolation is enforced by matching the `user_id` column against the Clerk JWT `sub` claim.
+
+### Entity-Relationship Diagram
+
+```mermaid
+erDiagram
+    channel_types ||--o{ user_channels : "configures"
+    auth_users ||--o{ user_channels : "owns"
+    user_channels ||--o{ scheduled_posts : "targets"
+    idea_groups ||--o{ ideas : "categorizes"
+    auth_users ||--o{ ideas : "owns"
+    auth_users ||--o{ scheduled_posts : "creates"
+
+    channel_types {
+        uuid id PK
+        text type UK "TWITTER, LINKEDIN, etc."
+        text name
+        text color
+        integer character_limit
+        timestamptz created_at
+    }
+
+    user_channels {
+        uuid id PK
+        text user_id FK "Clerk User ID"
+        uuid channel_type_id FK
+        text provider_account_id
+        text handle
+        text profile_image
+        text profile_url
+        text access_token "AES-256-GCM Encrypted"
+        text refresh_token "AES-256-GCM Encrypted"
+        timestamptz token_expires_at
+        boolean is_connected
+        boolean is_active
+        timestamptz created_at
+        timestamptz updated_at
+    }
+
+    scheduled_posts {
+        uuid id PK
+        text user_id FK "Clerk User ID"
+        uuid user_channel_id FK
+        text content
+        jsonb images "Array of {url, key}"
+        timestamptz scheduled_at
+        text status "draft, queue, publishing, published, failed, cancelled"
+        timestamptz published_at
+        text published_url
+        text error_message
+        timestamptz created_at
+        timestamptz updated_at
+    }
+
+    idea_groups {
+        uuid id PK
+        text name UK "Unassigned, To Do, In Progress, Done"
+        timestamptz created_at
+    }
+
+    ideas {
+        uuid id PK
+        text user_id FK "Clerk User ID"
+        uuid group_id FK
+        text title
+        text description
+        jsonb images "Array of {url, key}"
+        integer sort_order
+        timestamptz created_at
+        timestamptz updated_at
+    }
 ```
-auth.users (Clerk-managed via InsForge JWT)
-    │
-    ├── channel_types        (seed table — platform metadata, character limits)
-    │       │
-    │       └── user_channels (one row per connected OAuth account)
-    │               │
-    │               └── scheduled_posts (one row per scheduled/drafted post)
-    │
-    ├── idea_groups          (seed table — Kanban column names)
-    │       │
-    │       └── ideas         (user idea cards)
-    │
-    └── subscriptions        (billing plan records)
+
+### Table Definitions
+
+#### 1. `channel_types` *(Lookup Table)*
+Contains the 8 supported social platforms and their global configuration:
+- `id` (`UUID`, Primary Key)
+- `type` (`TEXT`, Unique: `TWITTER`, `LINKEDIN`, `INSTAGRAM`, `THREADS`, `FACEBOOK`, `BLUESKY`, `YOUTUBE`, `TIKTOK`)
+- `name` (`TEXT`, e.g., `"Twitter / X"`, `"LinkedIn"`)
+- `color` (`TEXT`, Hex brand color)
+- `character_limit` (`INTEGER`, Character threshold)
+- `created_at` (`TIMESTAMPTZ`)
+
+#### 2. `user_channels` *(RLS-Protected)*
+Stores connected accounts with encrypted OAuth tokens.
+- `id` (`UUID`, Primary Key)
+- `user_id` (`TEXT`, Not Null, Indexed — Clerk `sub`)
+- `channel_type_id` (`UUID`, Foreign Key → `channel_types.id`)
+- `provider_account_id` (`TEXT`, Platform's native user identifier)
+- `handle` (`TEXT`, Profile handle or screen name)
+- `profile_image` (`TEXT`, Avatar URL)
+- `profile_url` (`TEXT`, Public profile URL)
+- `access_token` (`TEXT`, AES-256-GCM encrypted ciphertext)
+- `refresh_token` (`TEXT`, AES-256-GCM encrypted ciphertext)
+- `token_expires_at` (`TIMESTAMPTZ`, Expiration timestamp)
+- `is_connected` (`BOOLEAN`, Active connection flag)
+- `is_active` (`BOOLEAN`, Soft delete flag)
+- `created_at` / `updated_at` (`TIMESTAMPTZ`)
+- **Constraint**: `UNIQUE (user_id, channel_type_id)`
+
+#### 3. `scheduled_posts` *(RLS-Protected)*
+Core table for all drafted and scheduled social content.
+- `id` (`UUID`, Primary Key)
+- `user_id` (`TEXT`, Not Null, Indexed — Clerk `sub`)
+- `user_channel_id` (`UUID`, Foreign Key → `user_channels.id` ON DELETE CASCADE)
+- `content` (`TEXT`, Post copy)
+- `images` (`JSONB`, Array of `{ url: string, key: string }` objects)
+- `scheduled_at` (`TIMESTAMPTZ`, Planned publication date/time)
+- `status` (`TEXT`, Check constraint: `'draft'`, `'queue'`, `'publishing'`, `'published'`, `'failed'`, `'cancelled'`)
+- `published_at` (`TIMESTAMPTZ`, Timestamp when publication completed)
+- `published_url` (`TEXT`, Direct link to published post on social platform)
+- `error_message` (`TEXT`, Failure explanation if publishing failed)
+- `created_at` / `updated_at` (`TIMESTAMPTZ`)
+
+#### 4. `idea_groups` *(Lookup Table)*
+Pre-seeded Kanban columns:
+- `id` (`UUID`, Primary Key)
+- `name` (`TEXT`, Unique: `Unassigned`, `To Do`, `In Progress`, `Done`)
+- `created_at` (`TIMESTAMPTZ`)
+
+#### 5. `ideas` *(RLS-Protected)*
+Individual idea brainstorm cards:
+- `id` (`UUID`, Primary Key)
+- `user_id` (`TEXT`, Not Null, Indexed — Clerk `sub`)
+- `group_id` (`UUID`, Foreign Key → `idea_groups.id`)
+- `title` (`TEXT`, Idea headline)
+- `description` (`TEXT`, Draft copy or notes)
+- `images` (`JSONB`, Reference media attachments)
+- `sort_order` (`INTEGER`, Column position index)
+- `created_at` / `updated_at` (`TIMESTAMPTZ`)
+
+---
+
+### Row-Level Security (RLS) & JWT Extraction
+
+InsForge validates user identities by extracting the Clerk JWT `sub` claim inside PostgreSQL using the `requesting_user_id()` function:
+
+```sql
+create or replace function public.requesting_user_id()
+returns text
+language sql stable
+as $$
+  select nullif(
+    current_setting('request.jwt.claims', true)::json->>'sub',
+    ''
+  )::text
+$$;
 ```
 
-### 1. `channel_types` Table *(Seeded lookup)*
-| Column | Type | Description |
-| :--- | :--- | :--- |
-| `id` | `UUID` | Primary Key |
-| `type` | `TEXT UNIQUE` | Platform key: `TWITTER`, `LINKEDIN`, `INSTAGRAM`, `THREADS`, `FACEBOOK`, `BLUESKY`, `YOUTUBE`, `TIKTOK` |
-| `name` | `TEXT` | Human-readable platform name |
-| `color` | `TEXT` | Platform brand hex color |
-| `character_limit` | `INTEGER` | Platform-enforced max character count |
-| `created_at` | `TIMESTAMPTZ` | Seed timestamp |
+All user tables enforce RLS:
+```sql
+alter table scheduled_posts enable row level security;
 
-### 2. `user_channels` Table *(RLS-protected)*
-| Column | Type | Constraints | Description |
-| :--- | :--- | :--- | :--- |
-| `id` | `UUID` | Primary Key | Unique channel record ID |
-| `user_id` | `TEXT` | Not Null, Indexed | Clerk User ID (JWT `sub`) |
-| `channel_type_id` | `UUID` | FK → `channel_types.id` | Platform reference |
-| `provider_account_id` | `TEXT` | Nullable | Platform-specific user ID |
-| `handle` | `TEXT` | Nullable | Platform username or display name |
-| `profile_image` | `TEXT` | Nullable | Profile picture URL |
-| `profile_url` | `TEXT` | Nullable | Public profile URL |
-| `access_token` | `TEXT` | Nullable | AES-256-GCM encrypted access token |
-| `refresh_token` | `TEXT` | Nullable | AES-256-GCM encrypted refresh token |
-| `token_expires_at` | `TIMESTAMPTZ` | Nullable | Token expiration timestamp |
-| `is_connected` | `BOOLEAN` | Default `false` | Connection active flag |
-| `is_active` | `BOOLEAN` | Default `true` | Soft-delete flag |
-| `created_at` | `TIMESTAMPTZ` | Default `NOW()` | Connection timestamp |
-| `updated_at` | `TIMESTAMPTZ` | Default `NOW()` | Last update timestamp |
+create policy scheduled_posts_policy on scheduled_posts
+  for all using (user_id = requesting_user_id())
+  with check (user_id = requesting_user_id());
+```
 
-> **Unique constraint:** `(user_id, channel_type_id)` — one connection per platform per user.
+---
 
-### 3. `scheduled_posts` Table *(RLS-protected)*
-| Column | Type | Constraints | Description |
-| :--- | :--- | :--- | :--- |
-| `id` | `UUID` | Primary Key | Unique post identifier |
-| `user_id` | `TEXT` | Not Null, Indexed | Clerk User ID |
-| `user_channel_id` | `UUID` | FK → `user_channels.id` CASCADE | Target connected channel |
-| `content` | `TEXT` | Not Null | Post caption or body text |
-| `images` | `JSONB` | Default `'[]'` | Array of `{ url, key }` image objects |
-| `scheduled_at` | `TIMESTAMPTZ` | Not Null | Intended publishing timestamp |
-| `status` | `TEXT` | Check: `queue`, `draft`, `published`, `failed` | Post lifecycle status |
-| `published_at` | `TIMESTAMPTZ` | Nullable | Actual publish timestamp |
-| `published_url` | `TEXT` | Nullable | URL of the published post |
-| `error_message` | `TEXT` | Nullable | Failure reason if publishing failed |
-| `created_at` | `TIMESTAMPTZ` | Default `NOW()` | Creation timestamp |
-| `updated_at` | `TIMESTAMPTZ` | Default `NOW()` | Last modification timestamp |
+### Migration Files & Execution
 
-### 4. `idea_groups` Table *(Seeded lookup)*
-| Column | Type | Description |
-| :--- | :--- | :--- |
-| `id` | `UUID` | Primary Key |
-| `name` | `TEXT UNIQUE` | Group name: `Unassigned`, `To Do`, `In Progress`, `Done` |
-| `created_at` | `TIMESTAMPTZ` | Seed timestamp |
+Database migrations are located in [`lib/db/`](lib/db/):
 
-### 5. `ideas` Table *(RLS-protected)*
-| Column | Type | Constraints | Description |
-| :--- | :--- | :--- | :--- |
-| `id` | `UUID` | Primary Key | Unique idea identifier |
-| `user_id` | `TEXT` | Not Null, Indexed | Clerk User ID |
-| `group_id` | `UUID` | FK → `idea_groups.id` | Kanban column assignment |
-| `title` | `TEXT` | Not Null | Idea headline or title |
-| `description` | `TEXT` | Nullable | Detailed draft notes or caption |
-| `images` | `JSONB` | Default `'[]'` | Array of `{ url, key }` image objects |
-| `sort_order` | `INTEGER` | Default `0` | Position within Kanban column |
-| `created_at` | `TIMESTAMPTZ` | Default `NOW()` | Creation timestamp |
-| `updated_at` | `TIMESTAMPTZ` | Default `NOW()` | Last modification timestamp |
+1. **`create-social-scheduling-tables.sql`**: Creates `requesting_user_id()`, `channel_types`, `user_channels`, `idea_groups`, `ideas`, and `scheduled_posts` with initial RLS policies and seeds.
+2. **`fix-channel-types-rls.sql`**: Enables public read policies on lookup tables (`channel_types`, `idea_groups`) to resolve RLS evaluation warnings.
+3. **`002-add-publishing-cancelled-status.sql`**: Expands the `scheduled_posts.status` check constraint to include `publishing` (for Inngest atomic claims) and `cancelled` (for safe cancellation), and creates composite query indexes:
+   - `idx_scheduled_posts_user_status` on `(user_id, status)`.
+   - `idx_scheduled_posts_status_scheduled_at` on `(status, scheduled_at)` where status in `('queue', 'publishing')`.
 
-### Initializing the Schema
+#### Applying Migrations
 
-Run the migration SQL file against your InsForge PostgreSQL instance:
-
+Run through the InsForge CLI:
 ```bash
-# Via InsForge CLI
+# Apply baseline schema
 insforge db execute --file lib/db/create-social-scheduling-tables.sql
 
-# Or paste directly in the InsForge SQL Editor at:
-# https://your-project.us-east.insforge.app
+# Apply lookup table RLS fix
+insforge db execute --file lib/db/fix-channel-types-rls.sql
+
+# Apply status expansion and performance indexes
+insforge db execute --file lib/db/002-add-publishing-cancelled-status.sql
 ```
+
+*Alternatively, paste the SQL files directly into the SQL Editor in your InsForge Project Dashboard.*
 
 ---
 
-## AI Integration
+## Post State Machine & Lifecycle Transitions
 
-Media Scheduler uses **Google Gemini 2.5 Flash** as its primary AI engine, with automatic fallback to the **InsForge AI Gateway** when no direct API key is configured.
+Media Scheduler enforces a deterministic state machine defined in [`constants/post.ts`](constants/post.ts). Client actions and background workers are strictly restricted to valid transitions.
 
-### AI Features
-
-| Feature | Endpoint | Description |
-| :--- | :--- | :--- |
-| **Post Generation** | `POST /api/post/generate-post` | Generate, rephrase, shorten, or expand post copy |
-| **Idea Brainstorming** | `POST /api/idea/generate` | Generate 3 content ideas from business type + audience |
-| **Inline Composer AI** | Client-side via `/api/post/generate-post` | Live AI assistance inside the post dialog |
-
-### Actions Supported (`ActionType`)
-- `generate` — Write a fresh post based on a freeform prompt
-- `rephrase` — Rewrite existing content with same meaning
-- `shorten` — Condense content while preserving key message
-- `expand` — Add helpful detail while maintaining tone
-
-### Model Configuration
-
-```bash
-# Primary: Direct Google Gemini API (recommended)
-GEMINI_API_KEY=<your_gemini_api_key>
-
-# Optional model override (defaults to gemini-2.5-flash)
-GEMINI_MODEL=gemini-2.5-flash
-
-# Fallback: InsForge AI Gateway (no key needed if InsForge is configured)
-# Uses: google/gemini-2.5-flash via InsForge
+```mermaid
+stateDiagram-v2
+    [*] --> draft : User Saves Draft
+    [*] --> queue : User Schedules Post
+    
+    draft --> queue : User Schedules Draft
+    draft --> cancelled : User Cancels Draft
+    
+    queue --> draft : User Reverts to Draft
+    queue --> cancelled : User Cancels Post
+    queue --> publishing : Inngest Cron Claims Post
+    
+    publishing --> published : Publish Succeeds (Inngest Worker)
+    publishing --> failed : Publish Fails (Inngest Worker)
+    
+    failed --> queue : User Retries Post
+    failed --> cancelled : User Cancels Failed Post
+    
+    published --> [*] : Terminal State
+    cancelled --> [*] : Terminal State
 ```
+
+### Transition Rules (`ALLOWED_TRANSITIONS`)
+
+| Current Status | Allowed Client Next Statuses | Transition Initiator | Description |
+| :--- | :--- | :--- | :--- |
+| `draft` | `queue`, `cancelled` | Client (User) | Post can be scheduled or discarded |
+| `queue` | `draft`, `cancelled` | Client (User) | Post can be reverted or cancelled before publishing |
+| `publishing` | *(None — locked)* | Inngest Worker Only | Inngest worker holds an atomic lock; client cannot edit |
+| `published` | *(None — terminal)* | — | Immutable record of published content |
+| `failed` | `queue`, `cancelled` | Client (User) | User can correct errors and re-queue or cancel |
+| `cancelled` | *(None — terminal)* | — | Soft-cancelled record |
 
 ---
 
-## Background Publishing Workflow (Inngest)
+## AI Engine Architecture (Google Gemini 2.5 Flash)
 
-Media Scheduler delegates scheduled execution to [Inngest](https://www.inngest.com/), ensuring reliable publishing without long-running server processes. The system uses a **cron-based polling + event fan-out** architecture.
+AI content generation is implemented in [`lib/ai.ts`](lib/ai.ts) using a dual-engine strategy:
+
+```
+User AI Request
+      │
+      ├── Has GEMINI_API_KEY? ──► [Direct Google Gemini 2.5 Flash API]
+      │                                (Native REST, temperature: 0.7)
+      │
+      └── Fallback ─────────────► [InsForge AI Gateway]
+                                       (google/gemini-2.5-flash via BaaS)
+```
+
+### Input Sanitization & Safety Limits (`AI_LIMITS`)
+To prevent prompt injection, model runaway, and excessive token usage, all inputs are validated server-side:
+- **`MAX_PROMPT_CHARS`**: 2,000 characters
+- **`MAX_CONTENT_CHARS`**: 5,000 characters
+- **`MAX_BUSINESS_TYPE_CHARS`**: 200 characters
+- **`MAX_TARGET_AUDIENCE_CHARS`**: 200 characters
+
+### System Prompt Engineering
+Prompts are customized dynamically per platform:
+- Injects target platform tone (e.g., professional for LinkedIn, concise with hashtags for Twitter/X).
+- Enforces character limit constraints directly in the generation instruction.
+- Strictly instructs the model to return plain text without markdown fences, quotes, or conversational filler.
+- In idea ideation mode, Gemini operates in JSON Mode (`responseMimeType: "application/json"`) returning structured `{ ideas: [{ title, description }] }`.
+
+---
+
+## Background Publishing Pipeline (Inngest)
+
+Background scheduling uses serverless event-driven execution with **Inngest**, avoiding long-running Node.js processes or flaky container timers.
+
+### Publishing Architecture Diagram
 
 ```mermaid
 sequenceDiagram
     autonumber
-    actor User
-    participant App as Next.js App Router
-    participant DB as InsForge PostgreSQL
+    actor User as User
+    participant App as Next.js API
+    participant DB as InsForge DB
     participant Inngest as Inngest Engine
-    participant Social as Social Platform API
+    participant Social as Social Platform API (Twitter/LinkedIn)
 
-    User->>App: Create Post (status = 'queue', scheduled_at = future)
-    App->>DB: INSERT into scheduled_posts (status='queue')
-    App-->>User: Post saved confirmation
+    User->>App: Schedule Post (status='queue', scheduled_at=T)
+    App->>DB: INSERT scheduled_posts (status='queue')
+    App-->>User: Confirmation Toast
 
-    Note over Inngest: Cron fires every 10 minutes
-
+    Note over Inngest: Cron fires every 10 minutes (*/10 * * * *)
     Inngest->>App: Trigger publishScheduledPostsCron
+    
     App->>DB: SELECT posts WHERE status='queue' AND scheduled_at <= NOW()
-    App->>Inngest: Send 'post/publish.requested' event per due post
-
-    Inngest->>App: Trigger publishScheduledPost (per post)
-    App->>DB: Fetch post + user_channels + channel_types
-    App->>DB: UPDATE status = 'publishing'
-    App->>DB: Decrypt access_token (AES-256-GCM)
-    App->>Social: Dispatch post to platform API (Twitter v2 / LinkedIn UGC)
-
-    alt Token Expired
-        App->>Social: Attempt token refresh via refreshOauthToken
-        App->>DB: Update encrypted refresh token
+    
+    loop For each due post
+        App->>DB: UPDATE scheduled_posts SET status='publishing' WHERE id=P.id AND status='queue'
+        Note over App,DB: Atomic Claim — prevents duplicate publishes
     end
 
-    alt Successful Publish
-        Social-->>App: Return published Post ID / URL
-        App->>DB: UPDATE status='published', published_at, published_url
-    else API Failure
-        Social-->>App: Error (rate limit, expired token, etc.)
-        App->>DB: UPDATE status='failed', error_message
+    App->>Inngest: Fan-out 'post/publish.requested' events
+    
+    Inngest->>App: Trigger publishScheduledPost (worker)
+    App->>DB: Load post + user_channel + channel_type
+    App->>App: Decrypt access_token (AES-256-GCM)
+
+    alt Token Expired?
+        App->>Social: Request Token Refresh (refreshOauthToken)
+        Social-->>App: New Access + Refresh Tokens
+        App->>DB: UPDATE user_channels (new encrypted tokens)
+    end
+
+    alt Platform == TWITTER
+        App->>Social: Upload images via api.x.com/2/media/upload
+        Social-->>App: Return media_ids
+        App->>Social: POST api.x.com/2/tweets { text, media }
+        Social-->>App: Return Tweet ID
+    else Platform == LINKEDIN
+        App->>Social: Initialize upload via rest/images
+        App->>Social: PUT binary image bytes
+        App->>Social: POST rest/posts (API version 202604)
+        Social-->>App: Return restli ID
+    end
+
+    alt Success
+        App->>DB: UPDATE scheduled_posts SET status='published', published_at=NOW(), published_url=URL
+    else Failure
+        App->>DB: UPDATE scheduled_posts SET status='failed', error_message=Error
+        Note over Inngest: Retries up to 3 times for transient 429/5xx errors
     end
 ```
 
-### Inngest Functions
+### Worker Functions & Idempotent Claiming
 
-| Function ID | Trigger | Description |
-| :--- | :--- | :--- |
-| `publish-scheduled-posts-cron` | Cron: `*/10 * * * *` | Polls `scheduled_posts` for due items and fans out `post/publish.requested` events |
-| `publish-scheduled-post` | Event: `post/publish.requested` | Loads post, decrypts tokens, refreshes if expired, dispatches to social API, records result |
+Located in [`inngest/functions/publish-scheduled-posts.ts`](inngest/functions/publish-scheduled-posts.ts):
+
+1. **`publishScheduledPostsCron`**:
+   - **Trigger**: Cron `*/10 * * * *` (every 10 minutes).
+   - **Atomic Claiming**: Uses a conditional update query:
+     ```sql
+     UPDATE scheduled_posts
+     SET status = 'publishing', updated_at = NOW()
+     WHERE id = :id AND status = 'queue';
+     ```
+     Only posts where the update affected 1 row are dispatched to Inngest. This guarantees that if the cron fires concurrently or two workers run at once, neither post can be processed twice.
+   - **Fan-Out**: Emits a `post/publish.requested` event for each claimed post ID.
+
+2. **`publishScheduledPost`**:
+   - **Trigger**: Event `post/publish.requested`.
+   - **Retries**: 3 automatic retries with exponential backoff for network or rate-limit failures (`429`, `5xx`).
+   - Verifies the post is in `publishing` state.
+   - Decrypts stored OAuth tokens.
+   - Refreshes expired tokens via `refreshOauthToken` and saves newly encrypted credentials.
+   - Dispatches payload to the platform-specific publisher.
+   - Records `published` with `published_url` or `failed` with `error_message`.
+
+### Platform Dispatch Implementations
+
+- **Twitter / X Publishing (`publishToTwitter`)**:
+  - Uploads images to `https://api.x.com/2/media/upload` using `multipart/form-data` with `media_category = "tweet_image"`.
+  - Dispatches tweet to `https://api.x.com/2/tweets` using Bearer authentication and returns public URL `https://x.com/{handle}/status/{tweetId}`.
+- **LinkedIn Publishing (`publishToLinkedIn`)**:
+  - Initializes media upload via `https://api.linkedin.com/rest/images?action=initializeUpload` with `Linkedin-Version: 202604`.
+  - Streams image binary buffer to LinkedIn's signed upload URL.
+  - Submits post to `https://api.linkedin.com/rest/posts` with commentary and author URN `urn:li:person:{id}`.
+  - Returns feed URL `https://www.linkedin.com/feed/update/{restliId}`.
 
 ---
 
-## Getting Started & Local Setup
+## Security & Production Hardening
+
+- **AES-256-GCM Token Encryption**:
+  - Plaintext access and refresh tokens are never stored.
+  - Encryption uses Node.js native `crypto.createCipheriv("aes-256-gcm", key, iv)`.
+  - Stored format: `ivHex:authTagHex:encryptedHex`. Every record receives a unique random 12-byte IV and 16-byte authentication tag preventing replay and tampering attacks.
+- **OAuth CSRF State Validation**:
+  - State parameter contains HMAC-SHA256 signature binding the `userId`, `channelTypeId`, and timestamp.
+  - Validated against a signed, encrypted `HttpOnly`, `SameSite=Lax` cookie.
+- **Strict Row-Level Security (RLS)**:
+  - Every table access is checked against the authenticated user's Clerk JWT `sub`. Users can never read, modify, or delete another tenant's channels, posts, or ideas.
+- **Image Upload Sanitization**:
+  - Files are validated by size (10 MB cap), declared MIME type, extension, and **binary magic byte signatures** (e.g., `FF D8 FF` for JPEG, `89 50 4E 47` for PNG).
+  - Storage keys are generated strictly on the server: `images/${userId}/${timestamp}-${sanitizedName}`.
+- **Comprehensive HTTP Security Headers** (`next.config.ts`):
+  - `Content-Security-Policy`: Restricts scripts to self, Clerk, and Inngest; connects to Clerk, InsForge, Google Gemini, and social APIs.
+  - `Strict-Transport-Security`: `max-age=31536000; includeSubDomains; preload` (1 year).
+  - `X-Frame-Options: DENY` (prevents clickjacking).
+  - `X-Content-Type-Options: nosniff`.
+  - `Referrer-Policy: strict-origin-when-cross-origin`.
+  - `Permissions-Policy`: Disables camera, microphone, geolocation, and USB.
+- **Remote Image Host Allowlist**:
+  - Next.js image optimization is restricted to trusted hostnames: `img.clerk.com`, `**.insforge.app`, `pbs.twimg.com`, `media.licdn.com`, `**.cdninstagram.com`, `graph.facebook.com`, `**.bsky.app`.
+
+---
+
+## Getting Started & Local Development
 
 ### Prerequisites
-- **Node.js**: v18.18+ or v20+ recommended
-- **Package Manager**: `npm` (or `pnpm` / `yarn`)
-- **Accounts Needed**:
-  - [Clerk](https://clerk.com/) — authentication
-  - [InsForge](https://insforge.dev) — PostgreSQL database & storage
-  - [Inngest](https://www.inngest.com/docs/local-development) — background job runner
-  - [Google AI Studio](https://aistudio.google.com/) — Gemini API key (optional, InsForge AI fallback available)
-  - Developer accounts for Twitter/X, LinkedIn, Meta, etc. (optional for local OAuth testing)
 
-### Installation
+- **Node.js**: `v20.x` or `v22.x` (LTS recommended).
+- **Package Manager**: `npm` (v10+) or `pnpm`.
+- **Git**: For version control.
+
+### Installation Steps
 
 1. **Clone the repository:**
    ```bash
@@ -535,213 +1092,196 @@ sequenceDiagram
    npm install
    ```
 
-3. **Configure Environment Variables:**
+3. **Generate cryptographic security keys:**
    ```bash
-   cp .env.example .env
-   ```
-   Fill in your Clerk, InsForge, Inngest, Gemini, and OAuth credentials (see [Environment Variables](#environment-variables)).
-
-4. **Configure Clerk JWT Template:**
-   In your [Clerk Dashboard](https://dashboard.clerk.com) → JWT Templates, create a template named `insforge` pointing to your InsForge project. Set `NEXT_PUBLIC_CLERK_INSFORGE_TEMPLATE=insforge` in your `.env`.
-
-5. **Initialize Database Tables:**
-   ```bash
-   # Run the migration SQL in your InsForge project SQL editor
-   # File: lib/db/create-social-scheduling-tables.sql
+   # Generates 32-byte hex keys for token encryption & state signing
+   node -e "console.log('CHANNEL_TOKEN_ENCRYPTION_KEY=' + require('crypto').randomBytes(32).toString('hex'))"
+   node -e "console.log('CHANNEL_OAUTH_STATE_SECRET=' + require('crypto').randomBytes(32).toString('hex'))"
    ```
 
-6. **Start the Next.js Development Server:**
+4. **Configure environment variables:**
+   ```bash
+   cp .env.example .env.local
+   ```
+   Open `.env.local` and fill in your Clerk, InsForge, Gemini, and Inngest keys.
+
+5. **Start the Next.js development server:**
    ```bash
    npm run dev
    ```
-   The application runs at [http://localhost:3000](http://localhost:3000).
+   Open [http://localhost:3000](http://localhost:3000) in your browser.
 
-7. **Start the Inngest Dev Server (separate terminal):**
+6. **Start the Inngest local development server (in a separate terminal):**
    ```bash
    npx inngest-cli@latest dev
    ```
-   The Inngest dashboard will be available at [http://localhost:8288](http://localhost:8288) to monitor cron jobs and events.
+   The Inngest dashboard will be available at [http://localhost:8288](http://localhost:8288) to inspect scheduled cron runs and test event dispatches.
 
 ---
 
-## Environment Variables
+### Third-Party Service Setup
 
-Create a `.env` file in the root directory (copy from `.env.example`):
+#### 1. Clerk Authentication
+1. Go to the [Clerk Dashboard](https://dashboard.clerk.com/) and create a project.
+2. Copy the **Publishable Key** and **Secret Key** into `.env.local`.
+3. In **JWT Templates**, click **New Template** → choose **Blank Template**:
+   - **Name**: `insforge`
+   - **Signing Algorithm**: RS256
+   - Ensure the template claims include `sub: {{user.id}}`.
+4. Set `NEXT_PUBLIC_CLERK_INSFORGE_TEMPLATE=insforge` and `CLERK_INSFORGE_TEMPLATE=insforge` in `.env.local`.
 
-```bash
-# ── InsForge BaaS (PostgreSQL + Storage + AI) ────────────────
-NEXT_PUBLIC_INSFORGE_BASE_URL=https://<your-project-id>.us-east.insforge.app
-NEXT_PUBLIC_INSFORGE_ANON_KEY=ik_<your_anon_key>
-INSFORGE_ANON_KEY=<your_insforge_jwt>
+#### 2. InsForge Database & Storage
+1. Create a project at [InsForge](https://insforge.dev).
+2. Copy your **Base URL**, **Anon Key**, and **Project API Key** into `.env.local`.
+3. Open the **SQL Editor** in the InsForge dashboard and run:
+   - `lib/db/create-social-scheduling-tables.sql`
+   - `lib/db/fix-channel-types-rls.sql`
+   - `lib/db/002-add-publishing-cancelled-status.sql`
+4. In **Storage**, create a public bucket named `lemon` (used for post media attachments).
 
-# ── Clerk Authentication ──────────────────────────────────────
-NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=pk_test_<your_publishable_key>
-CLERK_SECRET_KEY=sk_test_<your_secret_key>
-NEXT_PUBLIC_CLERK_INSFORGE_TEMPLATE=insforge
-CLERK_INSFORGE_TEMPLATE=insforge
+#### 3. Google Gemini AI
+1. Visit [Google AI Studio](https://aistudio.google.com/) and generate an API key.
+2. Add `GEMINI_API_KEY=your_key_here` to `.env.local`.
 
-# Clerk route config
-NEXT_PUBLIC_CLERK_SIGN_IN_URL=/routes/sign-in
-NEXT_PUBLIC_CLERK_SIGN_UP_URL=/routes/sign-up
-NEXT_PUBLIC_CLERK_SIGN_IN_FALLBACK_REDIRECT_URL=/
-NEXT_PUBLIC_CLERK_SIGN_UP_FALLBACK_REDIRECT_URL=/
-
-# ── App ───────────────────────────────────────────────────────
-NEXT_PUBLIC_APP_URL=http://localhost:3000
-
-# ── AI (Google Gemini 2.5 Flash) ─────────────────────────────
-# Get from: https://aistudio.google.com/
-GEMINI_API_KEY=<your_gemini_api_key>
-# Optional: override model (default: gemini-2.5-flash)
-# GEMINI_MODEL=gemini-2.5-flash
-
-# ── Inngest Background Jobs ───────────────────────────────────
-INNGEST_EVENT_KEY=<your_inngest_event_key>
-INNGEST_SIGNING_KEY=<your_inngest_signing_key>
-
-# ── Security Keys ─────────────────────────────────────────────
-# Generate: node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
-CHANNEL_TOKEN_ENCRYPTION_KEY=<32_byte_hex>
-CHANNEL_OAUTH_STATE_SECRET=<32_byte_hex>
-
-# ── Twitter / X OAuth ─────────────────────────────────────────
-TWITTER_CLIENT_ID=
-TWITTER_CLIENT_SECRET=
-TWITTER_AUTH_URL=https://x.com/i/oauth2/authorize
-TWITTER_TOKEN_URL=https://api.x.com/2/oauth2/token
-TWITTER_PROFILE_URL=https://api.x.com/2/users/me?user.fields=profile_image_url,username
-TWITTER_SCOPES=tweet.read,users.read,tweet.write,offline.access,media.write
-
-# ── Instagram ─────────────────────────────────────────────────
-INSTAGRAM_CLIENT_ID=
-INSTAGRAM_CLIENT_SECRET=
-INSTAGRAM_AUTH_URL=https://api.instagram.com/oauth/authorize
-INSTAGRAM_TOKEN_URL=https://api.instagram.com/oauth/access_token
-INSTAGRAM_PROFILE_URL=https://graph.instagram.com/me?fields=id,username,profile_picture_url
-INSTAGRAM_SCOPES=instagram_basic,instagram_content_publish,pages_read_engagement
-
-# ── Threads ───────────────────────────────────────────────────
-THREADS_CLIENT_ID=
-THREADS_CLIENT_SECRET=
-THREADS_AUTH_URL=https://threads.net/oauth/authorize
-THREADS_TOKEN_URL=https://graph.threads.net/oauth/access_token
-THREADS_PROFILE_URL=https://graph.threads.net/me?fields=id,username,threads_profile_picture_url
-THREADS_SCOPES=threads_basic,threads_content_publish
-
-# ── Facebook ──────────────────────────────────────────────────
-FACEBOOK_CLIENT_ID=
-FACEBOOK_CLIENT_SECRET=
-FACEBOOK_AUTH_URL=https://www.facebook.com/v19.0/dialog/oauth
-FACEBOOK_TOKEN_URL=https://graph.facebook.com/v19.0/oauth/access_token
-FACEBOOK_PROFILE_URL=https://graph.facebook.com/me?fields=id,name,picture
-FACEBOOK_SCOPES=pages_show_list,pages_read_engagement,pages_manage_posts
-
-# ── LinkedIn ──────────────────────────────────────────────────
-LINKEDIN_CLIENT_ID=
-LINKEDIN_CLIENT_SECRET=
-LINKEDIN_AUTH_URL=https://www.linkedin.com/oauth/v2/authorization
-LINKEDIN_TOKEN_URL=https://www.linkedin.com/oauth/v2/accessToken
-LINKEDIN_PROFILE_URL=https://api.linkedin.com/v2/userinfo
-LINKEDIN_SCOPES=openid,profile,email,w_member_social
-
-# ── Bluesky ───────────────────────────────────────────────────
-BLUESKY_CLIENT_ID=
-BLUESKY_CLIENT_SECRET=
-BLUESKY_AUTH_URL=https://bsky.social/oauth/authorize
-BLUESKY_TOKEN_URL=https://bsky.social/oauth/token
-BLUESKY_PROFILE_URL=https://bsky.social/xrpc/app.bsky.actor.getProfile
-BLUESKY_SCOPES=atproto,transition:generic
-
-# ── YouTube ───────────────────────────────────────────────────
-YOUTUBE_CLIENT_ID=
-YOUTUBE_CLIENT_SECRET=
-YOUTUBE_AUTH_URL=https://accounts.google.com/o/oauth2/v2/auth
-YOUTUBE_TOKEN_URL=https://oauth2.googleapis.com/token
-YOUTUBE_PROFILE_URL=https://www.googleapis.com/youtube/v3/channels?part=snippet&mine=true
-YOUTUBE_SCOPES=https://www.googleapis.com/auth/youtube.upload,https://www.googleapis.com/auth/youtube.readonly
-
-# ── TikTok ────────────────────────────────────────────────────
-TIKTOK_CLIENT_ID=
-TIKTOK_CLIENT_SECRET=
-TIKTOK_AUTH_URL=https://www.tiktok.com/v2/auth/authorize
-TIKTOK_TOKEN_URL=https://open.tiktokapis.com/v2/oauth/token
-TIKTOK_PROFILE_URL=https://open.tiktokapis.com/v2/user/info/?fields=open_id,avatar_url,display_name,username
-TIKTOK_SCOPES=user.info.basic,video.publish,video.upload
-```
+#### 4. Social Developer Apps (Optional for Local OAuth)
+- **Twitter / X**: Create a project in the [Twitter Developer Portal](https://developer.twitter.com). Enable OAuth 2.0 with PKCE, set callback URL to `http://localhost:3000/api/channel/callback`.
+- **LinkedIn**: Create an app in the [LinkedIn Developer Portal](https://developer.linkedin.com). Add the "Share on LinkedIn" and "Sign In with LinkedIn using OpenID Connect" products.
 
 ---
 
-## Docker & Container Deployment
+## Environment Variables Reference
 
-Media Scheduler includes a production-optimized multi-stage `Dockerfile` with `standalone` Next.js output and a `docker-compose.yml` for local container orchestration.
+| Variable | Required | Default | Description |
+| :--- | :---: | :---: | :--- |
+| **`NEXT_PUBLIC_INSFORGE_BASE_URL`** | Yes | — | InsForge project URL (e.g., `https://xyz.us-east.insforge.app`) |
+| **`NEXT_PUBLIC_INSFORGE_ANON_KEY`** | Yes | — | InsForge client anonymous API key (`ik_...`) |
+| **`INSFORGE_ANON_KEY`** | Yes | — | Server InsForge JWT token |
+| **`INSFORGE_PROJECT_API_KEY`** | Yes | — | Admin API key for Inngest workers and background uploads |
+| **`NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY`** | Yes | — | Clerk client publishable key (`pk_test_...`) |
+| **`CLERK_SECRET_KEY`** | Yes | — | Clerk server secret key (`sk_test_...`) |
+| **`NEXT_PUBLIC_CLERK_INSFORGE_TEMPLATE`** | Yes | `insforge` | Name of the Clerk JWT template pointing to InsForge |
+| **`CLERK_INSFORGE_TEMPLATE`** | Yes | `insforge` | Server-side template identifier |
+| **`NEXT_PUBLIC_CLERK_SIGN_IN_URL`** | Yes | `/routes/sign-in` | Clerk login page path |
+| **`NEXT_PUBLIC_CLERK_SIGN_UP_URL`** | Yes | `/routes/sign-up` | Clerk registration page path |
+| **`NEXT_PUBLIC_CLERK_SIGN_IN_FALLBACK_REDIRECT_URL`** | Yes | `/` | Post-login redirect target |
+| **`NEXT_PUBLIC_CLERK_SIGN_UP_FALLBACK_REDIRECT_URL`** | Yes | `/` | Post-signup redirect target |
+| **`NEXT_PUBLIC_APP_URL`** | Yes | `http://localhost:3000` | Fully-qualified public URL of the app |
+| **`GEMINI_API_KEY`** | Recommended | — | Google AI Studio Gemini API key |
+| **`GEMINI_MODEL`** | No | `gemini-2.5-flash` | Gemini model variant override |
+| **`CHANNEL_TOKEN_ENCRYPTION_KEY`** | Yes | — | 32-byte hex key for AES-256-GCM token encryption |
+| **`CHANNEL_OAUTH_STATE_SECRET`** | Yes | — | 32-byte hex secret for signing OAuth state cookies |
+| **`INNGEST_EVENT_KEY`** | Prod | — | Inngest event dispatch key (production) |
+| **`INNGEST_SIGNING_KEY`** | Prod | — | Inngest webhook signature verification key (production) |
+| **`TWITTER_CLIENT_ID`** | Optional | — | Twitter / X OAuth 2.0 Client ID |
+| **`TWITTER_CLIENT_SECRET`** | Optional | — | Twitter / X OAuth 2.0 Client Secret |
+| **`TWITTER_AUTH_URL`** | Optional | `https://x.com/i/oauth2/authorize` | Twitter OAuth 2.0 authorize endpoint |
+| **`TWITTER_TOKEN_URL`** | Optional | `https://api.x.com/2/oauth2/token` | Twitter OAuth 2.0 token endpoint |
+| **`TWITTER_PROFILE_URL`** | Optional | `https://api.x.com/2/users/me?...` | Twitter userinfo endpoint |
+| **`TWITTER_SCOPES`** | Optional | `tweet.read,users.read,...` | Comma-separated OAuth scopes |
+| **`LINKEDIN_CLIENT_ID`** | Optional | — | LinkedIn OAuth 2.0 Client ID |
+| **`LINKEDIN_CLIENT_SECRET`** | Optional | — | LinkedIn OAuth 2.0 Client Secret |
+| **`LINKEDIN_AUTH_URL`** | Optional | `https://www.linkedin.com/oauth/v2/authorization` | LinkedIn OAuth 2.0 authorize endpoint |
+| **`LINKEDIN_TOKEN_URL`** | Optional | `https://www.linkedin.com/oauth/v2/accessToken` | LinkedIn token endpoint |
+| **`LINKEDIN_PROFILE_URL`** | Optional | `https://api.linkedin.com/v2/userinfo` | LinkedIn profile endpoint |
+| **`LINKEDIN_SCOPES`** | Optional | `openid,profile,email,w_member_social` | Comma-separated OAuth scopes |
+| **`INSTAGRAM_CLIENT_ID`** | Optional | — | Meta / Instagram Client ID |
+| **`INSTAGRAM_CLIENT_SECRET`** | Optional | — | Meta / Instagram Client Secret |
+| **`THREADS_CLIENT_ID`** | Optional | — | Meta / Threads Client ID |
+| **`THREADS_CLIENT_SECRET`** | Optional | — | Meta / Threads Client Secret |
+| **`FACEBOOK_CLIENT_ID`** | Optional | — | Meta / Facebook App ID |
+| **`FACEBOOK_CLIENT_SECRET`** | Optional | — | Meta / Facebook App Secret |
+| **`BLUESKY_CLIENT_ID`** | Optional | — | Bluesky OAuth Client ID |
+| **`BLUESKY_CLIENT_SECRET`** | Optional | — | Bluesky OAuth Client Secret |
+| **`YOUTUBE_CLIENT_ID`** | Optional | — | Google Cloud OAuth Client ID |
+| **`YOUTUBE_CLIENT_SECRET`** | Optional | — | Google Cloud OAuth Client Secret |
+| **`TIKTOK_CLIENT_ID`** | Optional | — | TikTok for Developers Client Key |
+| **`TIKTOK_CLIENT_SECRET`** | Optional | — | TikTok for Developers Client Secret |
+
+---
+
+## Docker & Container Orchestration
+
+Media Scheduler includes a production-ready, multi-stage `Dockerfile` (using `node:20-alpine`) that leverages Next.js standalone build output to keep the image size under 150 MB.
 
 ### Run with Docker Compose
 
 ```bash
-# Build and run containers in detached mode
+# Build and run the app in detached mode
 docker compose up -d --build
 
-# View container logs
+# Run with local Inngest background dev server profile
+docker compose --profile with-inngest up -d --build
+
+# View container logs in real time
 docker compose logs -f
 
-# Stop containers
+# Stop and remove containers
 docker compose down
 ```
 
-### Build & Run Docker Image Manually
+### Manual Docker Build & Execution
 
 ```bash
-# Using npm scripts
+# Build production image using npm script
 npm run docker:build
-npm run docker:run
 
-# Or manually
-docker build -t media-scheduler:latest .
-docker run -p 3000:3000 --env-file .env media-scheduler:latest
+# Or build manually with build arguments
+docker build \
+  --build-arg NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=pk_test_... \
+  --build-arg NEXT_PUBLIC_INSFORGE_BASE_URL=https://... \
+  --build-arg NEXT_PUBLIC_INSFORGE_ANON_KEY=ik_... \
+  -t media-scheduler:latest .
+
+# Run container on port 3000
+docker run -p 3000:3000 --env-file .env.local media-scheduler:latest
 ```
-
-> **Note:** The `Dockerfile` uses multi-stage builds (`deps` → `builder` → `runner`) with `output: "standalone"` in `next.config.ts` for minimal image size.
-
----
-
-## Security & Encryption
-
-- **Token Ciphering:** OAuth access and refresh tokens are **never stored as plaintext**. They are encrypted using `AES-256-GCM` with a unique random IV and authentication tag per record, using the `CHANNEL_TOKEN_ENCRYPTION_KEY` environment variable. Decryption only happens server-side inside Inngest functions.
-- **OAuth CSRF Protection:** All OAuth flows generate a random cryptographic `state` parameter, signed and stored in a secure `HttpOnly`, `SameSite=Lax` cookie using `CHANNEL_OAUTH_STATE_SECRET`. PKCE (`code_verifier` / `code_challenge`) is applied where supported (Twitter/X).
-- **Row Level Security (RLS):** All InsForge database tables (`user_channels`, `scheduled_posts`, `ideas`) enforce RLS policies using `requesting_user_id()`, which reads the Clerk JWT `sub` claim from the request context.
-- **Authentication Guards:** All API route handlers verify Clerk session tokens via `auth()` before any database operation. Unauthenticated requests receive `401 Unauthorized`.
-- **Environment Isolation:** Sensitive keys (`CLERK_SECRET_KEY`, `INSFORGE_ANON_KEY`, `CHANNEL_TOKEN_ENCRYPTION_KEY`, `GEMINI_API_KEY`) are kept server-side only and are never exposed to the client bundle.
-- **Image CDN Allowlist:** `next.config.ts` restricts `next/image` to trusted domains: `img.clerk.com`, `*.insforge.app`, `pbs.twimg.com`, `media.licdn.com`.
 
 ---
 
 ## Available Scripts
 
-```bash
-# Start Next.js development server (with Turbopack)
-npm run dev
+All scripts can be executed via `npm run <script>`:
 
-# Build production bundle
-npm run build
+| Script | Command | Description |
+| :--- | :--- | :--- |
+| `dev` | `next dev` | Starts local Next.js development server on `http://localhost:3000` |
+| `build` | `next build` | Compiles production bundle with standalone server output |
+| `start` | `next start` | Runs the compiled production server on port 3000 |
+| `lint` | `eslint` | Runs ESLint checks against TypeScript and TSX files |
+| `docker:build` | `docker build -t media-scheduler .` | Builds production Docker container image |
+| `docker:run` | `docker run -p 3000:3000 --env-file .env.local media-scheduler` | Runs containerized application with local environment |
+| `docker:up` | `docker compose up -d` | Starts application services via Docker Compose in detached mode |
+| `docker:down` | `docker compose down` | Stops and cleans up Docker Compose services and networks |
 
-# Start production server
-npm run start
+---
 
-# Run ESLint code quality checks
-npm run lint
+## Troubleshooting & Common Questions
 
-# Docker shortcuts
-npm run docker:build   # Build Docker image tagged 'media-scheduler'
-npm run docker:run     # Run container on port 3000 with .env
-npm run docker:up      # docker compose up -d
-npm run docker:down    # docker compose down
-```
+### 1. Clerk JWT Template Warning: `resource_not_found`
+**Symptom**: Console logs show `[InsForge Auth] Clerk JWT Template 'insforge' not found. Falling back to PROJECT_API_KEY.`  
+**Fix**: Navigate to your **Clerk Dashboard → Configure → JWT Templates**, create a template named `insforge`, and set `CLERK_INSFORGE_TEMPLATE=insforge` in your environment.
+
+### 2. Status Constraint Error on Post Updates
+**Symptom**: Database error `violates check constraint "scheduled_posts_status_check"` when updating to `publishing` or `cancelled`.  
+**Fix**: You have not applied Migration 002. Execute `lib/db/002-add-publishing-cancelled-status.sql` against your InsForge database to expand allowed statuses.
+
+### 3. Posts Fail to Publish via Inngest
+**Symptom**: Scheduled post status changes to `failed` with message `Missing provider type or access token`.  
+**Fix**: Verify that the targeted channel is connected in **Settings → Channels** and that `CHANNEL_TOKEN_ENCRYPTION_KEY` matches the key used when the channel was connected. If the key was changed, disconnect and reconnect the channel.
+
+### 4. Image Upload Returns `INVALID_FILE_CONTENT` (415)
+**Symptom**: Uploading an image fails with status 415.  
+**Fix**: Media Scheduler verifies binary magic bytes. Files renamed with incorrect extensions (e.g., a text file saved as `.png`) are rejected. Ensure you are uploading a valid JPEG, PNG, GIF, or WebP image under 10 MB.
+
+### 5. Cannot Delete a Scheduled Post (409 Conflict)
+**Symptom**: Post deletion returns error `Post is currently 'queue' and cannot be deleted`.  
+**Fix**: This is an intentional safety mechanism to prevent race conditions while Inngest workers are executing. Cancel the post first (transition to `cancelled`), then proceed with deletion.
 
 ---
 
 ## License
 
-This project is licensed under the [MIT License](LICENSE).
+This project is open-source software licensed under the [MIT License](LICENSE).
 
 ```text
 MIT License
