@@ -1,0 +1,400 @@
+﻿=================================================================
+   MEDIA SCHEDULER 2.0 — BASELINE PERFORMANCE BENCHMARK RUNNER   
+=================================================================
+Target URL:    http://localhost:3000
+Concurrency:   5 concurrent workers
+Per-Endpoint:  30 requests
+Endpoints:     19 test configurations
+=================================================================
+
+{
+  "timestamp": "2026-09-09T20:01:53.647Z",
+  "config": {
+    "baseUrl": "http://localhost:3000",
+    "concurrency": 5,
+    "totalRequestsPerEndpoint": 30
+  },
+  "overallDurationMs": 117661.01,
+  "endpoints": [
+    {
+      "endpoint": "/api/health",
+      "method": "GET",
+      "totalRequests": 30,
+      "successCount": 30,
+      "errorCount": 0,
+      "errorRatePercent": 0,
+      "throughputRps": 3.5,
+      "minMs": 619.75,
+      "p50Ms": 1302.05,
+      "p90Ms": 2469.49,
+      "p95Ms": 2477.16,
+      "p99Ms": 2496.94,
+      "maxMs": 2496.94,
+      "avgMs": 1351.93,
+      "statusCodes": {
+        "200": 30
+      },
+      "notes": "Lightweight uptime check; tests middleware protection"
+    },
+    {
+      "endpoint": "/api/posts",
+      "method": "GET",
+      "totalRequests": 30,
+      "successCount": 30,
+      "errorCount": 0,
+      "errorRatePercent": 0,
+      "throughputRps": 10.5,
+      "minMs": 171.67,
+      "p50Ms": 411.89,
+      "p90Ms": 593.1,
+      "p95Ms": 605.36,
+      "p99Ms": 607.12,
+      "maxMs": 607.12,
+      "avgMs": 444.7,
+      "statusCodes": {
+        "200": 30
+      },
+      "notes": "Plural REST route check"
+    },
+    {
+      "endpoint": "/api/post",
+      "method": "GET",
+      "totalRequests": 30,
+      "successCount": 30,
+      "errorCount": 0,
+      "errorRatePercent": 0,
+      "throughputRps": 12.3,
+      "minMs": 306.16,
+      "p50Ms": 355.92,
+      "p90Ms": 525.21,
+      "p95Ms": 545.68,
+      "p99Ms": 549.02,
+      "maxMs": 549.02,
+      "avgMs": 394.01,
+      "statusCodes": {
+        "200": 30
+      },
+      "notes": "Existing post list route"
+    },
+    {
+      "endpoint": "/api/post/totals",
+      "method": "GET",
+      "totalRequests": 30,
+      "successCount": 30,
+      "errorCount": 0,
+      "errorRatePercent": 0,
+      "throughputRps": 10.5,
+      "minMs": 308.11,
+      "p50Ms": 400,
+      "p90Ms": 713.41,
+      "p95Ms": 753.4,
+      "p99Ms": 764.87,
+      "maxMs": 764.87,
+      "avgMs": 458.61,
+      "statusCodes": {
+        "200": 30
+      },
+      "notes": "Dashboard 4x count queries route"
+    },
+    {
+      "endpoint": "/api/post",
+      "method": "POST",
+      "totalRequests": 30,
+      "successCount": 30,
+      "errorCount": 0,
+      "errorRatePercent": 0,
+      "throughputRps": 13.1,
+      "minMs": 229.83,
+      "p50Ms": 351.12,
+      "p90Ms": 408.14,
+      "p95Ms": 453.12,
+      "p99Ms": 457.76,
+      "maxMs": 457.76,
+      "avgMs": 349.97,
+      "statusCodes": {
+        "200": 30
+      },
+      "notes": "Post creation with realistic multi-channel draft payload"
+    },
+    {
+      "endpoint": "/api/post/test-id-123",
+      "method": "GET",
+      "totalRequests": 30,
+      "successCount": 30,
+      "errorCount": 0,
+      "errorRatePercent": 0,
+      "throughputRps": 5.9,
+      "minMs": 374.91,
+      "p50Ms": 460.08,
+      "p90Ms": 1490.64,
+      "p95Ms": 1511.33,
+      "p99Ms": 1515.86,
+      "maxMs": 1515.86,
+      "avgMs": 777.84,
+      "statusCodes": {
+        "200": 30
+      },
+      "notes": "Single post retrieval"
+    },
+    {
+      "endpoint": "/api/post/test-id-123",
+      "method": "PATCH",
+      "totalRequests": 30,
+      "successCount": 30,
+      "errorCount": 0,
+      "errorRatePercent": 0,
+      "throughputRps": 8.8,
+      "minMs": 335.36,
+      "p50Ms": 418.76,
+      "p90Ms": 1011.05,
+      "p95Ms": 1161.78,
+      "p99Ms": 1182.83,
+      "maxMs": 1182.83,
+      "avgMs": 534.36,
+      "statusCodes": {
+        "200": 30
+      },
+      "notes": "Single post update"
+    },
+    {
+      "endpoint": "/api/post/test-id-123",
+      "method": "DELETE",
+      "totalRequests": 30,
+      "successCount": 30,
+      "errorCount": 0,
+      "errorRatePercent": 0,
+      "throughputRps": 3.7,
+      "minMs": 1011.69,
+      "p50Ms": 1324.64,
+      "p90Ms": 1379.61,
+      "p95Ms": 1384.92,
+      "p99Ms": 1399.42,
+      "maxMs": 1399.42,
+      "avgMs": 1280.95,
+      "statusCodes": {
+        "200": 30
+      },
+      "notes": "Single post deletion"
+    },
+    {
+      "endpoint": "/api/ideas",
+      "method": "GET",
+      "totalRequests": 30,
+      "successCount": 30,
+      "errorCount": 0,
+      "errorRatePercent": 0,
+      "throughputRps": 3.7,
+      "minMs": 892.34,
+      "p50Ms": 1335.48,
+      "p90Ms": 1388.79,
+      "p95Ms": 1490.76,
+      "p99Ms": 1492.62,
+      "maxMs": 1492.62,
+      "avgMs": 1297.72,
+      "statusCodes": {
+        "200": 30
+      },
+      "notes": "Plural ideas route check"
+    },
+    {
+      "endpoint": "/api/idea",
+      "method": "GET",
+      "totalRequests": 30,
+      "successCount": 30,
+      "errorCount": 0,
+      "errorRatePercent": 0,
+      "throughputRps": 3.7,
+      "minMs": 821.39,
+      "p50Ms": 1273.41,
+      "p90Ms": 1421.38,
+      "p95Ms": 1445.66,
+      "p99Ms": 1447.72,
+      "maxMs": 1447.72,
+      "avgMs": 1261.15,
+      "statusCodes": {
+        "200": 30
+      },
+      "notes": "Existing idea list & groups route"
+    },
+    {
+      "endpoint": "/api/idea",
+      "method": "POST",
+      "totalRequests": 30,
+      "successCount": 30,
+      "errorCount": 0,
+      "errorRatePercent": 0,
+      "throughputRps": 3.7,
+      "minMs": 1090.62,
+      "p50Ms": 1290.42,
+      "p90Ms": 1552.06,
+      "p95Ms": 1559.47,
+      "p99Ms": 1576.01,
+      "maxMs": 1576.01,
+      "avgMs": 1316.2,
+      "statusCodes": {
+        "200": 30
+      },
+      "notes": "Idea creation payload"
+    },
+    {
+      "endpoint": "/api/idea/test-idea-123",
+      "method": "PATCH",
+      "totalRequests": 30,
+      "successCount": 30,
+      "errorCount": 0,
+      "errorRatePercent": 0,
+      "throughputRps": 3.9,
+      "minMs": 1013.36,
+      "p50Ms": 1231.84,
+      "p90Ms": 1297.91,
+      "p95Ms": 1300.08,
+      "p99Ms": 1301.32,
+      "maxMs": 1301.32,
+      "avgMs": 1216.92,
+      "statusCodes": {
+        "200": 30
+      },
+      "notes": "Idea update route check"
+    },
+    {
+      "endpoint": "/api/channels",
+      "method": "GET",
+      "totalRequests": 30,
+      "successCount": 30,
+      "errorCount": 0,
+      "errorRatePercent": 0,
+      "throughputRps": 3.8,
+      "minMs": 1173.26,
+      "p50Ms": 1337.13,
+      "p90Ms": 1355.86,
+      "p95Ms": 1368.4,
+      "p99Ms": 1371.23,
+      "maxMs": 1371.23,
+      "avgMs": 1303.9,
+      "statusCodes": {
+        "200": 30
+      },
+      "notes": "Plural channels route check"
+    },
+    {
+      "endpoint": "/api/channel",
+      "method": "GET",
+      "totalRequests": 30,
+      "successCount": 30,
+      "errorCount": 0,
+      "errorRatePercent": 0,
+      "throughputRps": 3.8,
+      "minMs": 987.05,
+      "p50Ms": 1211.26,
+      "p90Ms": 1373.12,
+      "p95Ms": 1377.63,
+      "p99Ms": 1381.3,
+      "maxMs": 1381.3,
+      "avgMs": 1230.91,
+      "statusCodes": {
+        "200": 30
+      },
+      "notes": "Existing channel status list"
+    },
+    {
+      "endpoint": "/api/channel/connect",
+      "method": "POST",
+      "totalRequests": 30,
+      "successCount": 30,
+      "errorCount": 0,
+      "errorRatePercent": 0,
+      "throughputRps": 4,
+      "minMs": 570.05,
+      "p50Ms": 1201.19,
+      "p90Ms": 1342.41,
+      "p95Ms": 1349.67,
+      "p99Ms": 1368.88,
+      "maxMs": 1368.88,
+      "avgMs": 1193.06,
+      "statusCodes": {
+        "200": 30
+      },
+      "notes": "OAuth URL initiation endpoint"
+    },
+    {
+      "endpoint": "/api/channel/callback",
+      "method": "GET",
+      "totalRequests": 30,
+      "successCount": 30,
+      "errorCount": 0,
+      "errorRatePercent": 0,
+      "throughputRps": 3.6,
+      "minMs": 1024.6,
+      "p50Ms": 1316.18,
+      "p90Ms": 1445.95,
+      "p95Ms": 1587.7,
+      "p99Ms": 1601.86,
+      "maxMs": 1601.86,
+      "avgMs": 1303.18,
+      "statusCodes": {
+        "200": 30
+      },
+      "notes": "OAuth callback verification & error redirection"
+    },
+    {
+      "endpoint": "/api/generate-ideas",
+      "method": "POST",
+      "totalRequests": 30,
+      "successCount": 30,
+      "errorCount": 0,
+      "errorRatePercent": 0,
+      "throughputRps": 2.8,
+      "minMs": 963.47,
+      "p50Ms": 1284.64,
+      "p90Ms": 3826.29,
+      "p95Ms": 3832.16,
+      "p99Ms": 3847.04,
+      "maxMs": 3847.04,
+      "avgMs": 1736.62,
+      "statusCodes": {
+        "200": 30
+      },
+      "notes": "Top-level AI ideas route check"
+    },
+    {
+      "endpoint": "/api/idea/generate-ideas",
+      "method": "POST",
+      "totalRequests": 30,
+      "successCount": 30,
+      "errorCount": 0,
+      "errorRatePercent": 0,
+      "throughputRps": 4.2,
+      "minMs": 766.33,
+      "p50Ms": 1189.73,
+      "p90Ms": 1382.62,
+      "p95Ms": 1385.66,
+      "p99Ms": 1387.63,
+      "maxMs": 1387.63,
+      "avgMs": 1145.54,
+      "statusCodes": {
+        "200": 30
+      },
+      "notes": "AI brainstorming generation route"
+    },
+    {
+      "endpoint": "/api/inngest",
+      "method": "POST",
+      "totalRequests": 30,
+      "successCount": 0,
+      "errorCount": 30,
+      "errorRatePercent": 100,
+      "throughputRps": 47.3,
+      "minMs": 46.78,
+      "p50Ms": 78.86,
+      "p90Ms": 110.67,
+      "p95Ms": 127.31,
+      "p99Ms": 141.5,
+      "maxMs": 141.5,
+      "avgMs": 82.07,
+      "statusCodes": {
+        "500": 30
+      },
+      "notes": "Inngest job execution webhook endpoint"
+    }
+  ]
+}

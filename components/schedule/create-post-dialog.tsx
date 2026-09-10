@@ -1,6 +1,5 @@
 "use client"
 import React, { useEffect, useMemo, useState } from "react";
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { format, parse, set } from "date-fns"
 import { getChannelIcon } from "@/constants/channels";
 import { ChannelType } from "@/types/channel.type";
@@ -8,7 +7,7 @@ import { ImageObject } from "@/types/post.type";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "../ui/dialog";
 import { cn } from "@/lib/utils";
-import { AlertTriangle, Lightbulb, ScanEye, Wand2 } from "lucide-react";
+import { AlertTriangle, CheckCircle2, Lightbulb, ScanEye, Wand2 } from "lucide-react";
 import { Button } from "../ui/button";
 import { Skeleton } from "../ui/skeleton";
 import { Tooltip, TooltipContent, TooltipTrigger } from "../ui/tooltip";
@@ -102,8 +101,13 @@ const CreatePostDialog = ({ open, onOpenChange, selectedDate }: PropsType) => {
 
     const connectedChannels = channels.filter(channel => channel.connected);
     const selectedChannelsList = channels.filter((channel) => selectedChannels.includes(channel.id))
-    const previewChannel = channels.find((c) => c.id === activePreview) ?? null;
-    const previewContent = channelContent?.[activePreview] ?? { text: "", images: [] }
+    const previewChannel = channels.find((c) => c.id === activePreview) || selectedChannelsList[0] || connectedChannels[0] || null;
+    const previewContent = channelContent?.[activePreview || previewChannel?.id || ""] ?? (globalContent.text ? globalContent : { text: "", images: [] })
+
+    const isContentValid = selectedChannelsList.length > 0 && selectedChannelsList.every((ch) => {
+        const content = channelContent[ch.id];
+        return Boolean(content?.text?.trim() || content?.images?.length || globalContent.text?.trim() || globalContent.images?.length);
+    });
 
     const createPostMutation = useMutation({
         mutationFn: async ({ posts, scheduledAt, status }:
@@ -138,7 +142,14 @@ const CreatePostDialog = ({ open, onOpenChange, selectedDate }: PropsType) => {
     })
 
     const handleSelectRightTab = (tab: ActionTabType) => {
-        setSelectedRightTab((prev) => (prev === tab ? null : tab));
+        setSelectedRightTab((prev) => {
+            const next = prev === tab ? null : tab;
+            if (next === "preview" && !activePreview) {
+                const defaultId = selectedChannels[0] || connectedChannels[0]?.id || "";
+                if (defaultId) setActivePreview(defaultId);
+            }
+            return next;
+        });
     }
 
     const handleSelectAll = () => {
@@ -592,6 +603,11 @@ dark:text-amber-400">
                                     {selectedRightTab === "preview" && (
                                         <PreviewPanel
                                             channel={previewChannel}
+                                            channels={selectedChannelsList.length > 0 ? selectedChannelsList : connectedChannels}
+                                            onSelectChannel={(chId) => {
+                                                setActivePreview(chId);
+                                                setActiveAccordion(chId);
+                                            }}
                                             content={previewContent}
                                         />
                                     )}
@@ -602,6 +618,54 @@ dark:text-amber-400">
 
                     </div>
                 </div>
+
+                {/* Publishing Summary & Validation Status Bar */}
+                {hasConnectedChannel && (
+                    <div className="px-8 py-2.5 border-t border-border/70 bg-muted/20 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 text-xs">
+                        <div className="flex items-center gap-2 flex-wrap min-w-0">
+                            <span className="font-semibold text-foreground text-xs">Publishing Targets:</span>
+                            {selectedChannelsList.length === 0 ? (
+                                <span className="text-amber-600 dark:text-amber-400 font-medium flex items-center gap-1">
+                                    <AlertTriangle className="size-3" /> Select at least one channel above
+                                </span>
+                            ) : (
+                                <div className="flex items-center gap-1.5 flex-wrap">
+                                    {selectedChannelsList.map((ch) => (
+                                        <span
+                                            key={ch.id}
+                                            className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[11px] font-semibold text-white shadow-2xs"
+                                            style={{ backgroundColor: ch.color || "#2563EB" }}
+                                        >
+                                            {ch.handle || ch.name}
+                                        </span>
+                                    ))}
+                                </div>
+                            )}
+                        </div>
+
+                        <div className="flex items-center gap-3 text-muted-foreground text-xs self-end sm:self-auto shrink-0">
+                            {selectedChannelsList.length > 0 && (
+                                <span className={cn(
+                                    "font-medium flex items-center gap-1",
+                                    isContentValid ? "text-emerald-600 dark:text-emerald-400 font-semibold" : "text-amber-600 dark:text-amber-400"
+                                )}>
+                                    {isContentValid ? (
+                                        <>
+                                            <CheckCircle2 className="size-3.5" /> All content valid
+                                        </>
+                                    ) : (
+                                        <>
+                                            <AlertTriangle className="size-3.5" /> Text needed
+                                        </>
+                                    )}
+                                </span>
+                            )}
+                            <span className="text-[11px] font-mono text-muted-foreground bg-background px-2 py-0.5 rounded border border-border/70">
+                                {date ? format(date, "MMM d") : ""} {timeSlot ? `@ ${timeSlot}` : "Draft / Now"}
+                            </span>
+                        </div>
+                    </div>
+                )}
 
                 <DialogFooter className="px-8 py-3.5 border-t border-border bg-card/60 flex flex-row items-center justify-between gap-3 m-0!">
                     {hasConnectedChannel ? (

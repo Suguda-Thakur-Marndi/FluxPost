@@ -176,10 +176,10 @@ export function PostCalendar({
         }}
 
         dayPropGetter={(date: Date) => {
-          const isPastDate = isBefore(date, new Date())
+          const isPastDate = isBefore(date, startOfDay(new Date()))
           return {
-            className: isPastDate ? "bg-[#331f000f]! pointer-events-none" : "",
-            style: isPastDate ? { backgroundColor: "hsl(var(--muted) / 0.5)" } : {}
+            className: isPastDate ? "rbc-past-day opacity-75" : "",
+            style: isPastDate ? { backgroundColor: "hsl(var(--muted) / 0.3)" } : {}
           }
         }}
         components={{

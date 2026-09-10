@@ -7,7 +7,7 @@ import { Tabs, TabsList, TabsTrigger } from "../ui/tabs";
 import { Badge } from "../ui/badge";
 import ScheduleToolbar from "./schedule-toolbar";
 import { Skeleton } from "../ui/skeleton";
-import { AlarmClockCheck, ExternalLink, LayoutList, Plus, Send } from "lucide-react";
+import { AlarmClockCheck, ExternalLink, LayoutList, Plus, RotateCcw, Send } from "lucide-react";
 import { Button } from "../ui/button";
 import { format, formatDistanceToNow, isPast, parseISO } from "date-fns";
 import { Card, CardContent, CardFooter } from "../ui/card";
@@ -322,6 +322,23 @@ const ListView = ({ setCreatePostModalOpen }: {
                                             <Send className="size-3.5" />
                                           )}
                                           Publish Now
+                                        </Button>
+                                      )}
+
+                                      {post.status === "failed" && (
+                                        <Button 
+                                          variant="destructive"
+                                          size="sm"
+                                          className="h-8 text-xs font-semibold gap-1.5 rounded-lg shadow-2xs"
+                                          disabled={publishPostMutation.isPending}
+                                          onClick={() => handlePublishNow(post)}
+                                        >
+                                          {publishPostMutation.isPending ? (
+                                            <Spinner className="size-3.5" />
+                                          ) : (
+                                            <RotateCcw className="size-3.5" />
+                                          )}
+                                          Retry Publication
                                         </Button>
                                       )}
                                     </>

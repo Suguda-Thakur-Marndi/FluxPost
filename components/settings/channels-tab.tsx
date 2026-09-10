@@ -1,6 +1,6 @@
 
 "use client"
-import { Suspense, useEffect } from 'react'
+import { Suspense, useEffect, useState } from 'react'
 import { toast } from 'sonner'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useSearchParams } from 'next/navigation'
@@ -13,10 +13,19 @@ import { Badge } from '@/components/ui/badge'
 import { Button } from '../ui/button'
 import { Spinner } from '../ui/spinner'
 import { AlertCircle, CheckCircle2, Globe, Link2, RefreshCw, Unlink } from 'lucide-react'
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
+} from '../ui/dialog'
 
 function ChannelTabContent() {
     const searchParams = useSearchParams()
     const queryClient = useQueryClient()
+    const [disconnectTarget, setDisconnectTarget] = useState<ChannelType | null>(null)
 
     const { data: channelsData, isPending } = useQuery({
         queryKey: ["channels"],
@@ -225,9 +234,9 @@ function ChannelTabContent() {
                                                     <Button
                                                         variant="outline"
                                                         size="sm"
-                                                        className="h-8 px-3 text-xs font-semibold text-destructive hover:bg-destructive/10 hover:text-destructive border-border hover:border-destructive/30 rounded-lg transition-all"
+                                                        className="h-8 px-3 text-xs font-semibold text-destructive hover:bg-destructive/10 hover:text-destructive border-border hover:border-destructive/30 rounded-lg transition-all cursor-pointer"
                                                         disabled={isConnecting || isDisconnecting}
-                                                        onClick={() => handleDisconnect(channel.user_channel_id!)}
+                                                        onClick={() => setDisconnectTarget(channel)}
                                                     >
                                                         {isDisconnecting ? <Spinner className="size-3 mr-1.5" /> : null}
                                                         Disconnect
@@ -237,7 +246,7 @@ function ChannelTabContent() {
                                                 <Button
                                                     variant="default"
                                                     size="sm"
-                                                    className="h-8 px-3.5 text-xs font-semibold bg-primary text-primary-foreground hover:bg-primary/90 rounded-lg shadow-2xs gap-1.5 transition-all"
+                                                    className="h-8 px-3.5 text-xs font-semibold bg-primary text-primary-foreground hover:bg-primary/90 rounded-lg shadow-2xs gap-1.5 transition-all cursor-pointer"
                                                     disabled={isConnecting || isDisconnecting}
                                                     onClick={() => handleConnect(channel.id)}
                                                 >
@@ -252,6 +261,63 @@ function ChannelTabContent() {
                         })
                     )}
                 </div>
+
+                {/* Disconnect Confirmation Dialog */}
+                <Dialog open={!!disconnectTarget} onOpenChange={(open) => !open && setDisconnectTarget(null)}>
+                    <DialogContent className="max-w-md">
+                        <DialogHeader>
+                            <DialogTitle className="text-base font-bold text-foreground">
+                                Disconnect {disconnectTarget?.name} Account
+                            </DialogTitle>
+                            <DialogDescription className="text-xs text-muted-foreground mt-1">
+                                Are you sure you want to disconnect {disconnectTarget?.handle ? `@${disconnectTarget.handle}` : "this account"}? Any scheduled posts queued exclusively for this platform will not be published until reconnected.
+                            </DialogDescription>
+                        </DialogHeader>
+
+                        {disconnectTarget && (
+                            <div className="p-3 rounded-lg bg-muted/40 border border-border/70 flex items-center gap-3 my-2">
+                                <div 
+                                    className="size-8 rounded-lg flex items-center justify-center text-white shrink-0 shadow-xs"
+                                    style={{ backgroundColor: disconnectTarget.color || "var(--primary)" }}
+                                >
+                                    {getChannelIcon(disconnectTarget.type) ? (
+                                        <HugeiconsIcon icon={getChannelIcon(disconnectTarget.type)} color="currentColor" className="size-4 text-white" />
+                                    ) : (
+                                        <Globe className="size-4 text-white" />
+                                    )}
+                                </div>
+                                <div className="min-w-0">
+                                    <p className="text-xs font-semibold text-foreground">{disconnectTarget.handle || disconnectTarget.name}</p>
+                                    <p className="text-[11px] text-muted-foreground">Connected via OAuth 2.0</p>
+                                </div>
+                            </div>
+                        )}
+
+                        <DialogFooter className="gap-2 sm:gap-0">
+                            <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => setDisconnectTarget(null)}
+                                disabled={disconnectMutation.isPending}
+                            >
+                                Cancel
+                            </Button>
+                            <Button
+                                variant="destructive"
+                                size="sm"
+                                disabled={disconnectMutation.isPending}
+                                onClick={() => {
+                                    if (disconnectTarget?.user_channel_id) {
+                                        handleDisconnect(disconnectTarget.user_channel_id);
+                                        setDisconnectTarget(null);
+                                    }
+                                }}
+                            >
+                                {disconnectMutation.isPending ? "Disconnecting..." : "Confirm Disconnect"}
+                            </Button>
+                        </DialogFooter>
+                    </DialogContent>
+                </Dialog>
             </CardContent>
         </Card>
     )
